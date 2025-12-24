@@ -10,12 +10,12 @@ const placeholderToPost = (data: any): Post => ({
     content: data.body,
 });
 
-export async function getAllPosts(): Promise<Post[]> {
+export const getAllPosts = cache(async (): Promise<Post[]>  => {
     const posts = await fetch('https://jsonplaceholder.typicode.com/posts')
     .then((res) => res.json());
 
     return posts.map(placeholderToPost)
-}
+})
 
 export const getPostBySlug = cache(async (slug: string): Promise<Post> => {
     const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${slug}`)

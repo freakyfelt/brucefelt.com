@@ -1,4 +1,4 @@
-import { getAllPosts, getPostBySlug } from "@/lib/posts";
+import { getAllPosts, getPostBySlug } from "@/lib/data/posts";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
