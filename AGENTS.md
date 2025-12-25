@@ -23,6 +23,7 @@ This is a Next.js static site generation (SSG) project that generates a static w
 - `npm run start` - Start the production server
 - `npm run lint` - Run the linter in error mode
 - `npm run format` - Run the linter in write mode
+- `npm run test` - Run the tests using Vitest
 
 ## Dependencies
 
@@ -35,3 +36,5 @@ This project uses the following dependencies:
 - Tailwind CSS 4
 - Prettier 3
 - ESlint 9
+- Vitest 4
+- React Testing Library

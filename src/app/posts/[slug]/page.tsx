@@ -1,6 +1,9 @@
 import { getAllPosts, getPostBySlug } from "@/lib/data/posts";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { DateTime } from "@/components/ui/DateTime";
+import { PageContent } from "@/components/ui/PageContent";
+import { Header } from "@/components/ui/Header";
 
 export async function generateStaticParams() {
     const posts = await getAllPosts();
@@ -35,10 +38,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     }
 
     return (
-        <main>
-            <h1>{post.title}</h1>
-            <p>{post.date}</p>
-            <p>{post.content}</p>
-        </main>
+        <PageContent className="max-w-3xl">
+            <article>
+                <header className="mb-8">
+                    <Header as="h1" className="mb-4">{post.title}</Header>
+                    <div className="text-gray-500 text-sm">
+                        <DateTime timestamp={post.date} />
+                    </div>
+                </header>
+                <div className="prose prose-lg max-w-none">
+                    <p>{post.content}</p>
+                </div>
+            </article>
+        </PageContent>
     );
 }
