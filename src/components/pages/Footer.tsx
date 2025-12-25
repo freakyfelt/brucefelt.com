@@ -3,7 +3,7 @@ import { ExternalLinkIcon } from "@/components/common/ExternalLinkIcon";
 
 export function Footer() {
   return (
-    <footer className="w-full border-t bg-background">
+    <footer className="mt-auto w-full border-t bg-background">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <nav className="flex items-center gap-6 text-sm font-medium">
           <StyledLink href="/" variant="nav">
