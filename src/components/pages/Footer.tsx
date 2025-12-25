@@ -1,5 +1,5 @@
 import { StyledLink } from "@/components/common/StyledLink";
-import { ExternalLinkIcon } from "@/components/common/ExternalLinkIcon";
+import { SocialLink } from "@/components/common/SocialLink";
 
 export function Footer() {
   return (
@@ -17,20 +17,20 @@ export function Footer() {
           </StyledLink>
         </nav>
         <div className="flex items-center gap-4">
-          <ExternalLinkIcon
-            variant="github"
+          <SocialLink
+            target="github"
             className="text-foreground/60 hover:text-foreground/80 transition-colors"
           />
-          <ExternalLinkIcon
-            variant="linkedin"
+          <SocialLink
+            target="linkedin"
             className="text-foreground/60 hover:text-foreground/80 transition-colors"
           />
-          <ExternalLinkIcon
-            variant="bluesky"
+          <SocialLink
+            target="bluesky"
             className="text-foreground/60 hover:text-foreground/80 transition-colors"
           />
-          <ExternalLinkIcon
-            variant="twitter"
+          <SocialLink
+            target="twitter"
             className="text-foreground/60 hover:text-foreground/80 transition-colors"
           />
         </div>

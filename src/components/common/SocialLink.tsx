@@ -2,7 +2,7 @@ import React from "react";
 import { SiGithub, SiLinkedin, SiX, SiBluesky } from "react-icons/si";
 import { StyledLink } from "@/components/common/StyledLink";
 
-export type ExternalLinkVariant = "github" | "twitter" | "bluesky" | "linkedin";
+export type SocialLinkTarget = "github" | "twitter" | "bluesky" | "linkedin";
 
 interface LinkConfig {
   icon: React.ElementType;
@@ -10,7 +10,7 @@ interface LinkConfig {
   label: string;
 }
 
-const LINK_CONFIGS: Record<ExternalLinkVariant, LinkConfig> = {
+const LINK_CONFIGS: Record<SocialLinkTarget, LinkConfig> = {
   bluesky: {
     icon: SiBluesky,
     url: "https://bsky.app/profile/freakyfelt.bsky.social",
@@ -33,15 +33,15 @@ const LINK_CONFIGS: Record<ExternalLinkVariant, LinkConfig> = {
   },
 };
 
-interface ExternalLinkIconProps {
-  variant: ExternalLinkVariant;
+interface SocialLinkProps {
+  target: SocialLinkTarget;
   className?: string;
 }
 
-export function ExternalLinkIcon({
-  variant,
+export function SocialLink({
+  target: variant,
   className,
-}: ExternalLinkIconProps) {
+}: SocialLinkProps) {
   const { icon: Icon, url, label } = LINK_CONFIGS[variant];
 
   return (
