@@ -1,29 +1,54 @@
-import { Post } from "@/interfaces/post";
+import { PostMetadata } from "@/interfaces/post";
 import { cache } from "react";
+import fs from "fs";
+import path from "path";
+import { MDXContent } from "mdx/types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const placeholderToPost = (data: any): Post => ({
-  title: data.title,
-  slug: data.id.toString(),
-  date: data.date || "2024-01-01",
-  excerpt: data.body.substring(0, 100) + "...",
-  content: data.body,
+type Post = {
+  metadata: PostMetadata;
+  content: React.ComponentType;
+};
+
+const postsDirectory = path.join(process.cwd(), "src/content/posts");
+
+const importPost = cache(async (slug: string): Promise<Post> => {
+  const { metadata, default: content } = await import(
+    `@/content/posts/${slug}.mdx`
+  );
+  return { metadata: { ...metadata, slug }, content };
 });
 
-export const getAllPosts = cache(async (): Promise<Post[]> => {
-  const posts = await fetch("https://jsonplaceholder.typicode.com/posts").then(
-    (res) => res.json(),
+export const getAllPostMetadata = cache(async (): Promise<PostMetadata[]> => {
+  const fileNames = fs.readdirSync(postsDirectory);
+  const allPostsData = await Promise.all(
+    fileNames
+      .filter((fileName) => fileName.endsWith(".mdx"))
+      .map(async (fileName) => {
+        const slug = fileName.replace(/\.mdx$/, "");
+        const { metadata } = await importPost(slug);
+
+        return metadata;
+      }),
   );
 
-  return posts.map(placeholderToPost);
+  return allPostsData.sort((a, b) => (a.date < b.date ? 1 : -1));
 });
 
-export const getPostBySlug = cache(async (slug: string): Promise<Post> => {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${slug}`);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch post with slug: ${slug}`);
+export const getPostMetadataBySlug = async (
+  slug: string,
+): Promise<PostMetadata | null> => {
+  try {
+    const { metadata } = await importPost(slug);
+
+    return metadata;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
-  const post = await res.json();
+};
 
-  return placeholderToPost(post);
-});
+export const getPostContent = async (slug: string): Promise<MDXContent> => {
+  const { content } = await importPost(slug);
+
+  return content as MDXContent;
+};

@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PageContent } from "@/components/pages/PageContent";
 import { Heading } from "@/components/common/Heading";
-import { ExternalLink, Link } from "@/components/common/Link";
+import { ExternalLink } from "@/components/common/Link";
 
 export default function Home() {
   return (

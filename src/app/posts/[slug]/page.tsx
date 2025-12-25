@@ -1,12 +1,17 @@
-import { getAllPosts, getPostBySlug } from "@/lib/data/posts";
+import {
+  getAllPostMetadata,
+  getPostContent,
+  getPostMetadataBySlug,
+} from "@/lib/data/posts";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Time } from "@/components/common/Time";
 import { PageContent } from "@/components/pages/PageContent";
 import { Heading } from "@/components/common/Heading";
+import { PostContent } from "@/components/posts/PostContent";
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
+  const posts = await getAllPostMetadata();
 
   return posts.map((post) => ({
     slug: post.slug,
@@ -19,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getPostMetadataBySlug(slug);
 
   if (!post) {
     return {
@@ -39,26 +44,23 @@ export default async function PostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getPostMetadataBySlug(slug);
 
   if (!post) {
     notFound();
   }
+  const content = await getPostContent(slug);
 
   return (
-    <PageContent className="max-w-3xl">
+    <PageContent>
       <article>
-        <header className="mb-8">
-          <Heading as="h1" className="mb-4">
-            {post.title}
-          </Heading>
-          <div className="text-gray-500 text-sm">
+        <header>
+          <Heading as="h1">{post.title}</Heading>
+          <div className="border-b-1 border-gray-300 text-gray-500 text-sm pb-2 mb-4 dark:border-gray-700">
             <Time dateTime={post.date} />
           </div>
         </header>
-        <div className="prose prose-lg max-w-none">
-          <p>{post.content}</p>
-        </div>
+        <PostContent content={content} />
       </article>
     </PageContent>
   );

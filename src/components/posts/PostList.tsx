@@ -1,10 +1,10 @@
 import { Link } from "@/components/common/Link";
-import { Post } from "@/interfaces/post";
+import { PostMetadata } from "@/interfaces/post";
 import { Time } from "@/components/common/Time";
 import { Heading } from "@/components/common/Heading";
 
 interface PostListProps {
-  posts: Post[];
+  posts: PostMetadata[];
   variant?: "default" | "compact";
 }
 
@@ -17,7 +17,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
             key={post.slug}
             className="border-b border-gray-200 pb-2 last:border-0"
           >
-            <Heading as="h3" className="mb-0">
+            <Heading as="h3">
               <Link path={`/posts/${post.slug}`} variant="heading">
                 {post.title}
               </Link>
@@ -36,7 +36,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
       {posts.map((post) => (
         <li key={post.slug} className="group">
           <article>
-            <Heading as="h2" className="mb-2">
+            <Heading as="h2">
               <Link path={`/posts/${post.slug}`} variant="heading">
                 {post.title}
               </Link>
@@ -44,7 +44,9 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
             <p className="text-sm text-gray-500 mb-3">
               <Time dateTime={post.date} />
             </p>
-            <p className="text-gray-700 line-clamp-3">{post.excerpt}</p>
+            <p className="text-gray-700 line-clamp-3 dark:text-gray-300">
+              {post.excerpt}
+            </p>
           </article>
         </li>
       ))}

@@ -1,22 +1,20 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { PostList } from "./PostList";
-import { Post } from "@/interfaces/post";
+import { PostMetadata } from "@/interfaces/post";
 
-const mockPosts: Post[] = [
+const mockPosts: PostMetadata[] = [
   {
     title: "Test Post 1",
     slug: "test-post-1",
     date: "2024-01-01",
     excerpt: "Excerpt 1",
-    content: "Content 1",
   },
   {
     title: "Test Post 2",
     slug: "test-post-2",
     date: "2024-01-02",
     excerpt: "Excerpt 2",
-    content: "Content 2",
   },
 ];
 

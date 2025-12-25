@@ -10,7 +10,7 @@ export const linkVariants = cva(
   {
     variants: {
       variant: {
-        default: "text-foreground hover:underline",
+        default: "text-foreground hover:underline font-medium",
         nav: "text-foreground/60 hover:text-foreground/80",
         heading: "hover:text-primary",
         muted: "text-muted-foreground hover:text-foreground",

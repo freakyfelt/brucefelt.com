@@ -22,8 +22,7 @@ const eslintConfig = defineConfig([
           paths: [
             {
               name: "next/link",
-              message:
-                "Please use Link from @/components/common/Link instead.",
+              message: "Please use Link from @/components/common/Link instead.",
             },
           ],
         },
