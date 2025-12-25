@@ -6,6 +6,15 @@ This is a Next.js static site generation (SSG) project that generates a static w
 
 - All pages must be renderable via static site generation (SSG) and not be server side rendered (SSR) or client side rendered (CSR)
 
+
+## Project structure
+
+- `src/app` - Contains the Next.js pages and non-reusable components
+- `src/components` - Contains the React components used by the pages
+- `src/lib/data` - Contains the data fetching functions
+- `src/styles` - Contains the CSS files
+- `public` - Contains the static assets
+
 ## Useful commands
 
 - `npm run clean` - Clean the project by removing the `out` directory
