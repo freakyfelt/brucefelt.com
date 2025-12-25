@@ -2,6 +2,13 @@ import { Link } from "@/components/common/Link";
 import { PostMetadata } from "@/interfaces/post";
 import { Time } from "@/components/common/Time";
 import { Heading } from "@/components/common/Heading";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemTitle,
+} from "@/components/ui/item";
 
 interface PostListProps {
   posts: PostMetadata[];
@@ -11,45 +18,46 @@ interface PostListProps {
 export function PostList({ posts, variant = "default" }: PostListProps) {
   if (variant === "compact") {
     return (
-      <ul className="space-y-4" aria-label="Compact post list">
+      <ItemGroup className="gap-4" aria-label="Compact post list">
         {posts.map((post) => (
-          <li
-            key={post.slug}
-            className="border-b border-gray-200 pb-2 last:border-0"
-          >
-            <Heading as="h3">
-              <Link path={`/posts/${post.slug}`} variant="heading">
-                {post.title}
-              </Link>
-            </Heading>
-            <p className="text-sm text-gray-500">
-              <Time dateTime={post.date} />
-            </p>
-          </li>
+          <Item key={post.slug} variant="outline" asChild>
+            <Link path={`/posts/${post.slug}`} variant="heading">
+              <ItemContent>
+                <ItemTitle>
+                  <Heading as="h3">{post.title}</Heading>
+                </ItemTitle>
+                <ItemDescription className="text-sm text-gray-500">
+                  <Time dateTime={post.date} />
+                </ItemDescription>
+              </ItemContent>
+            </Link>
+          </Item>
         ))}
-      </ul>
+      </ItemGroup>
     );
   }
 
   return (
-    <ul className="space-y-8" aria-label="Post list">
+    <ItemGroup className="gap-8" aria-label="Post list">
       {posts.map((post) => (
-        <li key={post.slug} className="group">
-          <article>
-            <Heading as="h2">
-              <Link path={`/posts/${post.slug}`} variant="heading">
-                {post.title}
-              </Link>
-            </Heading>
-            <p className="text-sm text-gray-500 mb-3">
+        <Item key={post.slug} variant="outline">
+          <ItemContent>
+            <ItemTitle>
+              <Heading as="h2">
+                <Link path={`/posts/${post.slug}`} variant="heading">
+                  {post.title}
+                </Link>
+              </Heading>
+            </ItemTitle>
+            <div className="text-sm text-gray-500 mb-3">
               <Time dateTime={post.date} />
-            </p>
-            <p className="text-gray-700 line-clamp-3 dark:text-gray-300">
+            </div>
+            <ItemDescription className="text-gray-700 line-clamp-3 dark:text-gray-300">
               {post.excerpt}
-            </p>
-          </article>
-        </li>
+            </ItemDescription>
+          </ItemContent>
+        </Item>
       ))}
-    </ul>
+    </ItemGroup>
   );
 }

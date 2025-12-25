@@ -34,6 +34,13 @@ export const getAllPostMetadata = cache(async (): Promise<PostMetadata[]> => {
   return allPostsData.sort((a, b) => (a.date < b.date ? 1 : -1));
 });
 
+export const getRecentPosts = async (
+  count: number = 5,
+): Promise<PostMetadata[]> => {
+  const allPosts = await getAllPostMetadata();
+  return allPosts.slice(0, count);
+};
+
 export const getPostMetadataBySlug = async (
   slug: string,
 ): Promise<PostMetadata | null> => {
