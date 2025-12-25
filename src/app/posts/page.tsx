@@ -4,16 +4,16 @@ import { PageContent } from "@/components/pages/PageContent";
 import { Heading } from "@/components/common/Heading";
 
 export const metadata = {
-    title: "Posts Page",
+  title: "Posts Page",
 };
 
 export default async function PostsPage() {
-    const posts = await getAllPosts();
+  const posts = await getAllPosts();
 
-    return (
-        <PageContent>
-            <Heading as="h1">Posts Page</Heading>
-            <PostList posts={posts} />
-        </PageContent>
-    );
+  return (
+    <PageContent>
+      <Heading as="h1">Posts Page</Heading>
+      <PostList posts={posts} />
+    </PageContent>
+  );
 }

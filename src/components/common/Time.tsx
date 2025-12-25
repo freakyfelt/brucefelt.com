@@ -1,15 +1,32 @@
+import { formatDate, formatRelativeTime } from "@/lib/utils/time";
+
 interface TimeProps {
-    dateTime: string;
-    variant?: "absolute";
-    className?: string;
+  dateTime: string;
+  variant?: "absolute" | "relative";
+  className?: string;
 }
 
-export function Time({ dateTime, variant = "absolute", className }: TimeProps) {
-    // For now, we only support 'absolute' variant which renders the timestamp as is.
-    // The timestamp should be in ISO8601 compatible format.
-    return (
-        <time dateTime={dateTime} className={className}>
-            {dateTime}
-        </time>
-    );
+type RelativeTimeProps = TimeProps & {
+  variant: "relative";
+  /** Optional base date for relative time calculation. Defaults to now */
+  from?: Date;
+};
+
+export function Time(props: TimeProps | RelativeTimeProps) {
+  const {
+    dateTime,
+    className,
+    variant = "absolute",
+    from,
+  } = props as RelativeTimeProps;
+  const displayTime =
+    variant === "relative"
+      ? formatRelativeTime(dateTime, undefined, from)
+      : formatDate(dateTime);
+
+  return (
+    <time dateTime={dateTime} title={dateTime} className={className}>
+      {displayTime}
+    </time>
+  );
 }

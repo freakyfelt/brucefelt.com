@@ -9,7 +9,8 @@
     "clean": "rm -rf out",
     "format": "eslint --fix . && prettier --write .",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "posttest": "npm run format"
   },
   "dependencies": {
     "@radix-ui/react-navigation-menu": "^1.2.14",

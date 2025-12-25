@@ -12,8 +12,15 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
-          <Link href="/" className="flex items-center" aria-label="The Felt Facade - Home">
-            <span className="inline-block font-bold text-xl sm:text-2xl" aria-hidden="true">
+          <Link
+            href="/"
+            className="flex items-center"
+            aria-label="The Felt Facade - Home"
+          >
+            <span
+              className="inline-block font-bold text-xl sm:text-2xl"
+              aria-hidden="true"
+            >
               The Felt Facade
             </span>
           </Link>
@@ -30,7 +37,10 @@ export function Navbar() {
           </NavigationMenu>
         </div>
         <div className="flex flex-1 items-center justify-end">
-          <NavigationMenu className="max-w-none justify-end" aria-label="Secondary Navigation">
+          <NavigationMenu
+            className="max-w-none justify-end"
+            aria-label="Secondary Navigation"
+          >
             <NavigationMenuList className="m-0">
               <NavigationMenuItem>
                 <Link href="/about" legacyBehavior passHref>
