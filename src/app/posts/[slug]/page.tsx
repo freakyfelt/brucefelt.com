@@ -1,9 +1,9 @@
 import { getAllPosts, getPostBySlug } from "@/lib/data/posts";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DateTime } from "@/components/common/DateTime";
+import { Time } from "@/components/common/Time";
 import { PageContent } from "@/components/pages/PageContent";
-import { Header } from "@/components/common/Header";
+import { Heading } from "@/components/common/Heading";
 
 export async function generateStaticParams() {
     const posts = await getAllPosts();
@@ -41,9 +41,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <PageContent className="max-w-3xl">
             <article>
                 <header className="mb-8">
-                    <Header as="h1" className="mb-4">{post.title}</Header>
+                    <Heading as="h1" className="mb-4">{post.title}</Heading>
                     <div className="text-gray-500 text-sm">
-                        <DateTime timestamp={post.date} />
+                        <Time dateTime={post.date} />
                     </div>
                 </header>
                 <div className="prose prose-lg max-w-none">

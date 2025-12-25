@@ -1,7 +1,7 @@
 import { getAllPosts } from "@/lib/data/posts";
 import { PostList } from "@/components/posts/PostList";
 import { PageContent } from "@/components/pages/PageContent";
-import { Header } from "@/components/common/Header";
+import { Heading } from "@/components/common/Heading";
 
 export const metadata = {
     title: "Posts Page",
@@ -12,7 +12,7 @@ export default async function PostsPage() {
 
     return (
         <PageContent>
-            <Header as="h1">Posts Page</Header>
+            <Heading as="h1">Posts Page</Heading>
             <PostList posts={posts} />
         </PageContent>
     );

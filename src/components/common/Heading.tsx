@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-interface HeaderProps {
+interface HeadingProps {
     as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
     children: ReactNode;
     className?: string;
@@ -16,7 +16,7 @@ const styles = {
     h6: "text-xs font-semibold",
 };
 
-export function Header({ as: Component = "h1", children, className }: HeaderProps) {
+export function Heading({ as: Component = "h1", children, className }: HeadingProps) {
     return (
         <Component className={cn(styles[Component], className)}>
             {children}
