@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import React from "react";
 
-const linkVariants = cva(
+export const linkVariants = cva(
   "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm",
   {
     variants: {
@@ -21,33 +21,35 @@ const linkVariants = cva(
   },
 );
 
+export interface ExternalLinkProps
+  extends
+    React.AnchorHTMLAttributes<HTMLAnchorElement>,
+    VariantProps<typeof linkVariants> {}
+
+export const ExternalLink = React.forwardRef<
+  HTMLAnchorElement,
+  ExternalLinkProps
+>(({ className, variant, ...props }, ref) => {
+  return (
+    <a
+      ref={ref}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(linkVariants({ variant, className }))}
+      {...props}
+    />
+  );
+});
+
+ExternalLink.displayName = "ExternalLink";
+
 export interface StyledLinkProps
   extends
     React.ComponentPropsWithoutRef<typeof Link>,
-    VariantProps<typeof linkVariants> {
-  external?: boolean;
-}
+    VariantProps<typeof linkVariants> {}
 
 export const StyledLink = React.forwardRef<HTMLAnchorElement, StyledLinkProps>(
-  ({ className, variant, external, ...props }, ref) => {
-    const isExternal =
-      external ||
-      (typeof props.href === "string" && props.href.startsWith("http"));
-
-    if (isExternal) {
-      return (
-        <a
-          ref={ref}
-          href={props.href.toString()}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn(linkVariants({ variant, className }))}
-        >
-          {props.children}
-        </a>
-      );
-    }
-
+  ({ className, variant, ...props }, ref) => {
     return (
       <Link
         ref={ref}

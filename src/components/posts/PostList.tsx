@@ -1,4 +1,4 @@
-import { StyledLink } from "@/components/common/StyledLink";
+import { StyledLink } from "@/components/common/Link";
 import { Post } from "@/interfaces/post";
 import { Time } from "@/components/common/Time";
 import { Heading } from "@/components/common/Heading";

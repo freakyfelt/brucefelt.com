@@ -1,4 +1,4 @@
-import { StyledLink } from "@/components/common/StyledLink";
+import { StyledLink } from "@/components/common/Link";
 import Link from "next/link";
 import {
   NavigationMenu,

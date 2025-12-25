@@ -1,4 +1,4 @@
-import { StyledLink } from "@/components/common/StyledLink";
+import { StyledLink } from "@/components/common/Link";
 import { SocialLink } from "@/components/common/SocialLink";
 
 export function Footer() {
@@ -17,22 +17,10 @@ export function Footer() {
           </StyledLink>
         </nav>
         <div className="flex items-center gap-4">
-          <SocialLink
-            target="github"
-            className="text-foreground/60 hover:text-foreground/80 transition-colors"
-          />
-          <SocialLink
-            target="linkedin"
-            className="text-foreground/60 hover:text-foreground/80 transition-colors"
-          />
-          <SocialLink
-            target="bluesky"
-            className="text-foreground/60 hover:text-foreground/80 transition-colors"
-          />
-          <SocialLink
-            target="twitter"
-            className="text-foreground/60 hover:text-foreground/80 transition-colors"
-          />
+          <SocialLink target="github" variant="nav" />
+          <SocialLink target="linkedin" variant="nav" />
+          <SocialLink target="bluesky" variant="nav" />
+          <SocialLink target="twitter" variant="nav" />
         </div>
       </div>
     </footer>

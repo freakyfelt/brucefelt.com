@@ -1,6 +1,6 @@
 import React from "react";
 import { SiGithub, SiLinkedin, SiX, SiBluesky } from "react-icons/si";
-import { StyledLink } from "@/components/common/StyledLink";
+import { ExternalLink, type ExternalLinkProps } from "@/components/common/Link";
 
 export type SocialLinkTarget = "github" | "twitter" | "bluesky" | "linkedin";
 
@@ -36,22 +36,24 @@ const LINK_CONFIGS: Record<SocialLinkTarget, LinkConfig> = {
 interface SocialLinkProps {
   target: SocialLinkTarget;
   className?: string;
+  variant?: ExternalLinkProps["variant"];
 }
 
 export function SocialLink({
-  target: variant,
+  target,
   className,
+  variant = "none",
 }: SocialLinkProps) {
-  const { icon: Icon, url, label } = LINK_CONFIGS[variant];
+  const { icon: Icon, url, label } = LINK_CONFIGS[target];
 
   return (
-    <StyledLink
+    <ExternalLink
       href={url}
       className={className}
       aria-label={label}
-      variant="none"
+      variant={variant}
     >
       <Icon className="h-5 w-5" />
-    </StyledLink>
+    </ExternalLink>
   );
 }
