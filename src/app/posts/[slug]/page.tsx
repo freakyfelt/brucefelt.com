@@ -6,7 +6,7 @@ import {
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Time } from "@/components/common/Time";
-import { PageContent } from "@/components/pages/PageContent";
+import { PageContent } from "@/components/layout/PageContent";
 import { Heading } from "@/components/common/Heading";
 import { PostContent } from "@/components/posts/PostContent";
 

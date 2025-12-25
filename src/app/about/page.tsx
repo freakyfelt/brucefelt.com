@@ -1,4 +1,4 @@
-import { PageContent } from "@/components/pages/PageContent";
+import { PageContent } from "@/components/layout/PageContent";
 import { Heading } from "@/components/common/Heading";
 
 export default function AboutPage() {

@@ -1,4 +1,5 @@
 import { Link } from "@/components/common/Link";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -16,7 +17,7 @@ export function Navbar() {
             path="/"
             variant="none"
             className="flex items-center"
-            aria-label="The Felt Facade - Home"
+            aria-label="Home"
           >
             <span
               className="inline-block font-bold text-xl sm:text-2xl"
@@ -36,17 +37,6 @@ export function Navbar() {
                     Blog
                   </Link>
                 </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
-        <div className="flex flex-1 items-center justify-end">
-          <NavigationMenu
-            className="max-w-none justify-end"
-            aria-label="Secondary Navigation"
-          >
-            <NavigationMenuList className="m-0">
-              <NavigationMenuItem>
                 <NavigationMenuLink
                   asChild
                   className={navigationMenuTriggerStyle()}
@@ -58,6 +48,9 @@ export function Navbar() {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+        </div>
+        <div className="flex flex-1 items-center justify-end">
+          <ThemeToggle />
         </div>
       </div>
     </header>
