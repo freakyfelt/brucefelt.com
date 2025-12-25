@@ -1,9 +1,9 @@
 import { getAllPosts, getPostBySlug } from "@/lib/data/posts";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DateTime } from "@/components/ui/DateTime";
-import { PageContent } from "@/components/ui/PageContent";
-import { Header } from "@/components/ui/Header";
+import { DateTime } from "@/components/common/DateTime";
+import { PageContent } from "@/components/pages/PageContent";
+import { Header } from "@/components/common/Header";
 
 export async function generateStaticParams() {
     const posts = await getAllPosts();

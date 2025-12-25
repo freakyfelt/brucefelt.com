@@ -11,6 +11,9 @@ This is a Next.js static site generation (SSG) project that generates a static w
 
 - `src/app` - Contains the Next.js pages and non-reusable components
 - `src/components` - Contains the React components used by the pages
+    - `ui` - Reserved for shadcn components. Only use shadcn components here and never modify them directly
+    - `common` - Shared components
+    - `pages` - Page-level elements
 - `src/lib/data` - Contains the data fetching functions
 - `src/styles` - Contains the CSS files
 - `public` - Contains the static assets

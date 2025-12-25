@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Post } from "@/interfaces/post";
-import { DateTime } from "@/components/ui/DateTime";
-import { Header } from "@/components/ui/Header";
+import { DateTime } from "@/components/common/DateTime";
+import { Header } from "@/components/common/Header";
 
 interface PostListProps {
     posts: Post[];

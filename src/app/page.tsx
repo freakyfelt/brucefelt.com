@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { PageContent } from "@/components/ui/PageContent";
-import { Header } from "@/components/ui/Header";
+import { PageContent } from "@/components/pages/PageContent";
+import { Header } from "@/components/common/Header";
 
 export default function Home() {
   return (
