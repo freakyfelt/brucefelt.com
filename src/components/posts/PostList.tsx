@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StyledLink } from "@/components/common/StyledLink";
 import { Post } from "@/interfaces/post";
 import { Time } from "@/components/common/Time";
 import { Heading } from "@/components/common/Heading";
@@ -18,12 +18,9 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
             className="border-b border-gray-200 pb-2 last:border-0"
           >
             <Heading as="h3" className="mb-0">
-              <Link
-                href={`/posts/${post.slug}`}
-                className="hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-              >
+              <StyledLink href={`/posts/${post.slug}`} variant="heading">
                 {post.title}
-              </Link>
+              </StyledLink>
             </Heading>
             <p className="text-sm text-gray-500">
               <Time dateTime={post.date} />
@@ -40,12 +37,9 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
         <li key={post.slug} className="group">
           <article>
             <Heading as="h2" className="mb-2">
-              <Link
-                href={`/posts/${post.slug}`}
-                className="hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-              >
+              <StyledLink href={`/posts/${post.slug}`} variant="heading">
                 {post.title}
-              </Link>
+              </StyledLink>
             </Heading>
             <p className="text-sm text-gray-500 mb-3">
               <Time dateTime={post.date} />

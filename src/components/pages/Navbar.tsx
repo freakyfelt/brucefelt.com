@@ -1,3 +1,4 @@
+import { StyledLink } from "@/components/common/StyledLink";
 import Link from "next/link";
 import {
   NavigationMenu,
@@ -12,8 +13,9 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
-          <Link
+          <StyledLink
             href="/"
+            variant="none"
             className="flex items-center"
             aria-label="The Felt Facade - Home"
           >
@@ -23,7 +25,7 @@ export function Navbar() {
             >
               The Felt Facade
             </span>
-          </Link>
+          </StyledLink>
           <NavigationMenu aria-label="Main Navigation">
             <NavigationMenuList>
               <NavigationMenuItem>

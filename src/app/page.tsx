@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PageContent } from "@/components/pages/PageContent";
 import { Heading } from "@/components/common/Heading";
+import { StyledLink } from "@/components/common/StyledLink";
 
 export default function Home() {
   return (
@@ -24,28 +25,27 @@ export default function Home() {
           </Heading>
           <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
             Looking for a starting point or more instructions? Head over to{" "}
-            <a
+            <StyledLink
               href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
               className="font-medium text-zinc-950 dark:text-zinc-50"
             >
               Templates
-            </a>{" "}
+            </StyledLink>{" "}
             or the{" "}
-            <a
+            <StyledLink
               href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
               className="font-medium text-zinc-950 dark:text-zinc-50"
             >
               Learning
-            </a>{" "}
+            </StyledLink>{" "}
             center.
           </p>
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <Button asChild>
-            <a
+            <StyledLink
               href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+              variant="none"
             >
               <Image
                 className="dark:invert mr-2"
@@ -55,16 +55,15 @@ export default function Home() {
                 height={16}
               />
               Deploy Now
-            </a>
+            </StyledLink>
           </Button>
           <Button variant="outline" asChild>
-            <a
+            <StyledLink
               href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
+              variant="none"
             >
               Documentation
-            </a>
+            </StyledLink>
           </Button>
         </div>
       </PageContent>

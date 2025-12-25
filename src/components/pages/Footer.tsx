@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { StyledLink } from "@/components/common/StyledLink";
 import { ExternalLinkIcon } from "@/components/common/ExternalLinkIcon";
 
 export function Footer() {
@@ -6,24 +6,15 @@ export function Footer() {
     <footer className="w-full border-t bg-background">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <nav className="flex items-center gap-6 text-sm font-medium">
-          <Link
-            href="/"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
+          <StyledLink href="/" variant="nav">
             Home
-          </Link>
-          <Link
-            href="/posts"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
+          </StyledLink>
+          <StyledLink href="/posts" variant="nav">
             Blog
-          </Link>
-          <Link
-            href="/about"
-            className="transition-colors hover:text-foreground/80 text-foreground/60"
-          >
+          </StyledLink>
+          <StyledLink href="/about" variant="nav">
             About
-          </Link>
+          </StyledLink>
         </nav>
         <div className="flex items-center gap-4">
           <ExternalLinkIcon

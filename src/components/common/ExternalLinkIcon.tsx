@@ -1,5 +1,6 @@
 import React from "react";
 import { SiGithub, SiLinkedin, SiX, SiBluesky } from "react-icons/si";
+import { StyledLink } from "@/components/common/StyledLink";
 
 export type ExternalLinkVariant = "github" | "twitter" | "bluesky" | "linkedin";
 
@@ -44,14 +45,13 @@ export function ExternalLinkIcon({
   const { icon: Icon, url, label } = LINK_CONFIGS[variant];
 
   return (
-    <a
+    <StyledLink
       href={url}
-      target="_blank"
-      rel="noopener noreferrer"
       className={className}
       aria-label={label}
+      variant="none"
     >
       <Icon className="h-5 w-5" />
-    </a>
+    </StyledLink>
   );
 }
