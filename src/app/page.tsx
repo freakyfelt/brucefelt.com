@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { PageContent } from "@/components/pages/PageContent";
 import { Heading } from "@/components/common/Heading";
-import { StyledLink } from "@/components/common/Link";
+import { ExternalLink, Link } from "@/components/common/Link";
 
 export default function Home() {
   return (
@@ -25,25 +25,25 @@ export default function Home() {
           </Heading>
           <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
             Looking for a starting point or more instructions? Head over to{" "}
-            <StyledLink
+            <ExternalLink
               href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
               className="font-medium text-zinc-950 dark:text-zinc-50"
             >
               Templates
-            </StyledLink>{" "}
+            </ExternalLink>{" "}
             or the{" "}
-            <StyledLink
+            <ExternalLink
               href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
               className="font-medium text-zinc-950 dark:text-zinc-50"
             >
               Learning
-            </StyledLink>{" "}
+            </ExternalLink>{" "}
             center.
           </p>
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <Button asChild>
-            <StyledLink
+            <ExternalLink
               href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
               variant="none"
             >
@@ -55,15 +55,15 @@ export default function Home() {
                 height={16}
               />
               Deploy Now
-            </StyledLink>
+            </ExternalLink>
           </Button>
           <Button variant="outline" asChild>
-            <StyledLink
+            <ExternalLink
               href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
               variant="none"
             >
               Documentation
-            </StyledLink>
+            </ExternalLink>
           </Button>
         </div>
       </PageContent>

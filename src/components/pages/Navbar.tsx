@@ -1,5 +1,4 @@
-import { StyledLink } from "@/components/common/Link";
-import Link from "next/link";
+import { Link } from "@/components/common/Link";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -13,8 +12,8 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
-          <StyledLink
-            href="/"
+          <Link
+            path="/"
             variant="none"
             className="flex items-center"
             aria-label="The Felt Facade - Home"
@@ -25,7 +24,7 @@ export function Navbar() {
             >
               The Felt Facade
             </span>
-          </StyledLink>
+          </Link>
           <NavigationMenu aria-label="Main Navigation">
             <NavigationMenuList>
               <NavigationMenuItem>
@@ -33,7 +32,9 @@ export function Navbar() {
                   asChild
                   className={navigationMenuTriggerStyle()}
                 >
-                  <Link href="/posts">Blog</Link>
+                  <Link path="/posts" variant="nav">
+                    Blog
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
@@ -50,7 +51,9 @@ export function Navbar() {
                   asChild
                   className={navigationMenuTriggerStyle()}
                 >
-                  <Link href="/about">About</Link>
+                  <Link path="/about" variant="nav">
+                    About
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>

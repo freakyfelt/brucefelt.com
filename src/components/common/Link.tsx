@@ -1,4 +1,6 @@
-import Link from "next/link";
+/* eslint-disable no-restricted-imports */
+import NextLink from "next/link";
+/* eslint-enable no-restricted-imports */
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import React from "react";
@@ -43,16 +45,25 @@ export const ExternalLink = React.forwardRef<
 
 ExternalLink.displayName = "ExternalLink";
 
-export interface StyledLinkProps
+export interface LinkProps
   extends
-    React.ComponentPropsWithoutRef<typeof Link>,
-    VariantProps<typeof linkVariants> {}
+    Omit<React.ComponentPropsWithoutRef<typeof NextLink>, "href">,
+    VariantProps<typeof linkVariants> {
+  path: string;
+}
 
-export const StyledLink = React.forwardRef<HTMLAnchorElement, StyledLinkProps>(
-  ({ className, variant, ...props }, ref) => {
+export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
+  ({ className, variant, path, ...props }, ref) => {
+    if (!path.startsWith("/") && !path.startsWith("#")) {
+      throw new Error(
+        `Link should not be used for absolute URLs: ${path}. Use ExternalLink instead.`,
+      );
+    }
+
     return (
-      <Link
+      <NextLink
         ref={ref}
+        href={path}
         className={cn(linkVariants({ variant, className }))}
         {...props}
       />
@@ -60,4 +71,4 @@ export const StyledLink = React.forwardRef<HTMLAnchorElement, StyledLinkProps>(
   },
 );
 
-StyledLink.displayName = "StyledLink";
+Link.displayName = "Link";

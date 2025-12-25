@@ -1,4 +1,4 @@
-import { StyledLink } from "@/components/common/Link";
+import { Link } from "@/components/common/Link";
 import { SocialLink } from "@/components/common/SocialLink";
 
 export function Footer() {
@@ -6,15 +6,15 @@ export function Footer() {
     <footer className="mt-auto w-full border-t bg-background">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <nav className="flex items-center gap-6 text-sm font-medium">
-          <StyledLink href="/" variant="nav">
+          <Link path="/" variant="nav">
             Home
-          </StyledLink>
-          <StyledLink href="/posts" variant="nav">
+          </Link>
+          <Link path="/posts" variant="nav">
             Blog
-          </StyledLink>
-          <StyledLink href="/about" variant="nav">
+          </Link>
+          <Link path="/about" variant="nav">
             About
-          </StyledLink>
+          </Link>
         </nav>
         <div className="flex items-center gap-4">
           <SocialLink target="github" variant="nav" />
