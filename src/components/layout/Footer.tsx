@@ -1,5 +1,6 @@
 import { Link } from "@/components/common/Link";
 import { SocialLink } from "@/components/common/SocialLink";
+import { paths } from "@/lib/utils/url";
 
 export function Footer() {
   return (
@@ -9,7 +10,7 @@ export function Footer() {
           <Link path="/" variant="nav">
             Home
           </Link>
-          <Link path="/posts" variant="nav">
+          <Link path={paths.blogPosts()} variant="nav">
             Blog
           </Link>
           <Link path="/about" variant="nav">

@@ -1,5 +1,6 @@
 import { Link } from "@/components/common/Link";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { paths } from "@/lib/utils/url";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -33,7 +34,7 @@ export function Navbar() {
                   asChild
                   className={navigationMenuTriggerStyle()}
                 >
-                  <Link path="/posts" variant="nav">
+                  <Link path={paths.blogPosts()} variant="nav">
                     Blog
                   </Link>
                 </NavigationMenuLink>

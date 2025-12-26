@@ -2,6 +2,7 @@ import { Link } from "@/components/common/Link";
 import { Post } from "@/interfaces/post";
 import { Time } from "@/components/common/Time";
 import { Heading } from "@/components/common/Heading";
+import { paths } from "@/lib/utils/url";
 import {
   Item,
   ItemContent,
@@ -21,7 +22,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
       <ItemGroup className="gap-4" aria-label="Compact post list">
         {posts.map((post) => (
           <Item key={post.slug} variant="outline" asChild>
-            <Link path={`/posts/${post.slug}`} variant="heading">
+            <Link path={paths.blogPost(post.slug)} variant="heading">
               <ItemContent>
                 <ItemTitle>
                   <Heading as="h3">{post.title}</Heading>
@@ -44,7 +45,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
           <ItemContent>
             <ItemTitle>
               <Heading as="h2">
-                <Link path={`/posts/${post.slug}`} variant="heading">
+                <Link path={paths.blogPost(post.slug)} variant="heading">
                   {post.title}
                 </Link>
               </Heading>
