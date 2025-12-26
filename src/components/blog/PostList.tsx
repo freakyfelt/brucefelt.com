@@ -3,7 +3,7 @@ import { Post } from "@/interfaces/post";
 import { Time } from "@/components/common/Time";
 import { Heading } from "@/components/common/Heading";
 import { paths } from "@/lib/utils/url";
-import { PostTags } from "@/components/posts/PostTags";
+import { PostTags } from "@/components/blog/PostTags";
 import {
   Item,
   ItemContent,

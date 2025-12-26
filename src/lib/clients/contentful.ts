@@ -1,20 +1,27 @@
 import { Post } from "@/interfaces/post";
+import { Tag } from "@/interfaces/tag";
 import { Document } from "@contentful/rich-text-types";
 
 const { CONTENTFUL_SPACE_ID, CONTENTFUL_ACCESS_TOKEN } = process.env;
 
-const BATCH_SIZE = 100;
-
-// use the content-model.json to generate the query
 const ALL_POST_SLUGS_QUERY = `
 query FetchAllPostSlugs($limit: Int, $skip: Int = 0) {
   blogPostCollection(limit: $limit, skip: $skip, order: publishDate_DESC) {
     items {
       slug
+      tagsCollection(limit: 10) {
+        items {
+          slug
+          displayName
+          description
+        }
+      }
     }
   }
 }
 `;
+
+type ContentfulPostMetadata = Pick<ContentfulPost, "slug" | "tagsCollection">;
 
 const POST_CONTENT_QUERY = `
 query FetchBlogPosts($slugs: [String]) {
@@ -24,7 +31,11 @@ query FetchBlogPosts($slugs: [String]) {
       title
       description
       publishDate
-      tags
+      tagsCollection(limit: 10) {
+        items {
+          slug
+        }
+      }
       heroImage {
         url(transform: {height: 1024})
       }
@@ -41,7 +52,9 @@ export type ContentfulPost = {
   title: string;
   description: string;
   publishDate: string;
-  tags: string[];
+  tagsCollection: {
+    items: Tag[];
+  };
   heroImage?: {
     url: string;
   };
@@ -55,7 +68,7 @@ const decodeContentfulPost = (post: ContentfulPost): Post => ({
   slug: post.slug,
   publishDate: post.publishDate,
   description: post.description,
-  tags: post.tags,
+  tags: post.tagsCollection.items.map((tag) => tag.slug),
   heroImage: post.heroImage?.url,
   body: post.body.json,
 });
@@ -85,35 +98,53 @@ async function fetchGraphQL(
   return res.json();
 }
 
+/**
+ * uses a skip/limit approach to fetch all results
+ */
+async function batchFetchGraphQL<TOut>(
+  query: string,
+  variables: Record<string, unknown> = {},
+  batchSize: number = 100,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transformer: (data: any) => TOut[],
+): Promise<TOut[]> {
+  const results: TOut[] = [];
+  let skip = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const res = await fetchGraphQL(query, {
+      ...variables,
+      skip,
+      limit: batchSize,
+    });
+    const batchResults = transformer(res.data);
+    results.push(...batchResults);
+    hasMore = batchResults.length === batchSize;
+    skip += batchSize;
+  }
+
+  return results;
+}
+
 type PostMetadata = {
   slug: string;
+  tags: Tag[];
 };
 
 export async function getAllPostSlugs(): Promise<PostMetadata[]> {
-  // Fetch all posts in batches of BATCH_SIZE
-  const allPosts: PostMetadata[] = [];
-  let hasMore = true;
-  let skip = 0;
-
-  while (hasMore) {
-    const entries = await fetchGraphQL(ALL_POST_SLUGS_QUERY, {
-      limit: BATCH_SIZE,
-      skip,
-    });
-    const posts = entries?.data?.blogPostCollection?.items;
-    if (posts) {
-      allPosts.push(...posts);
-    }
-    hasMore = posts?.length === BATCH_SIZE;
-    skip += BATCH_SIZE;
-  }
-
-  return allPosts;
+  return batchFetchGraphQL(ALL_POST_SLUGS_QUERY, {}, 100, (data) => {
+    const posts = data!.blogPostCollection!.items as ContentfulPostMetadata[];
+    return posts.map((post) => ({
+      slug: post.slug,
+      tags: post.tagsCollection.items,
+    }));
+  });
 }
 
 export async function getBlogPosts(slugs: string[]): Promise<Post[]> {
-  const entries = await fetchGraphQL(POST_CONTENT_QUERY, { slugs });
-  return (entries?.data?.blogPostCollection?.items || []).map(
-    decodeContentfulPost,
-  );
+  return batchFetchGraphQL(POST_CONTENT_QUERY, { slugs }, 10, (data) => {
+    const posts = data!.blogPostCollection!.items as ContentfulPost[];
+    return posts.map(decodeContentfulPost);
+  });
 }

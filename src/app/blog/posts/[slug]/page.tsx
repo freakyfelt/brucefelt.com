@@ -1,11 +1,11 @@
-import { getAllPosts, getPostBySlug } from "@/lib/data/posts";
+import { getAllPosts, getPostBySlug } from "@/lib/data/blog";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Time } from "@/components/common/Time";
 import { PageContent } from "@/components/layout/PageContent";
 import { Heading } from "@/components/common/Heading";
-import { PostContent } from "@/components/posts/PostContent";
-import { PostTags } from "@/components/posts/PostTags";
+import { PostContent } from "@/components/blog/PostContent";
+import { PostTags } from "@/components/blog/PostTags";
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();

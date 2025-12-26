@@ -6,6 +6,7 @@ export const post1: Post = {
   slug: "test-post-1",
   publishDate: "2024-01-01",
   description: "Excerpt 1",
+  tags: ["tag1", "tag2"],
   body: {
     nodeType: BLOCKS.DOCUMENT,
     data: {},
@@ -31,6 +32,7 @@ export const post2: Post = {
   slug: "test-post-2",
   publishDate: "2024-01-02",
   description: "Excerpt 2",
+  tags: ["tag1", "tag3"],
   body: {
     nodeType: BLOCKS.DOCUMENT,
     data: {},

@@ -6,7 +6,7 @@ export type Post = {
   publishDate: string;
   /** the meta:description for the post */
   description: string;
-  tags?: string[];
+  tags: string[];
   heroImage?: string;
   body: Document;
 };

@@ -1,4 +1,4 @@
-import { getAllPosts } from "@/lib/data/posts";
+import { getAllPosts } from "@/lib/data/blog";
 import { paths } from "@/lib/utils/url";
 import { permanentRedirect } from "next/navigation";
 
