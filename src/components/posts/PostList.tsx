@@ -3,6 +3,7 @@ import { Post } from "@/interfaces/post";
 import { Time } from "@/components/common/Time";
 import { Heading } from "@/components/common/Heading";
 import { paths } from "@/lib/utils/url";
+import { PostTags } from "@/components/posts/PostTags";
 import {
   Item,
   ItemContent,
@@ -21,7 +22,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
     return (
       <ItemGroup className="gap-4" aria-label="Compact post list">
         {posts.map((post) => (
-          <Item key={post.slug} variant="outline" asChild>
+          <Item key={post.slug} variant="outline" size="sm" asChild>
             <Link path={paths.blogPost(post.slug)} variant="heading">
               <ItemContent>
                 <ItemTitle>
@@ -50,8 +51,9 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
                 </Link>
               </Heading>
             </ItemTitle>
-            <div className="text-sm text-gray-500 mb-3">
+            <div className="text-sm text-gray-500 mb-3 flex justify-between items-center">
               <Time dateTime={post.publishDate} />
+              <PostTags tags={post.tags || []} />
             </div>
             <ItemDescription className="text-gray-700 line-clamp-3 dark:text-gray-300">
               {post.description}

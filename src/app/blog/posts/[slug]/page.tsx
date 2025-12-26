@@ -5,6 +5,7 @@ import { Time } from "@/components/common/Time";
 import { PageContent } from "@/components/layout/PageContent";
 import { Heading } from "@/components/common/Heading";
 import { PostContent } from "@/components/posts/PostContent";
+import { PostTags } from "@/components/posts/PostTags";
 
 export async function generateStaticParams() {
   const posts = await getAllPosts();
@@ -51,8 +52,9 @@ export default async function BlogPostPage({
       <article>
         <header>
           <Heading as="h1">{post.title}</Heading>
-          <div className="border-b-1 border-gray-300 text-gray-500 text-sm pb-2 mb-4 dark:border-gray-700">
+          <div className="border-b-1 border-gray-300 text-gray-500 text-sm pb-2 mb-4 dark:border-gray-700 flex justify-between items-center">
             <Time dateTime={post.publishDate} />
+            <PostTags tags={post.tags || []} />
           </div>
         </header>
         <PostContent content={post.body} />
