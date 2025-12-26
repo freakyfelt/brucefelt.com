@@ -1,61 +1,64 @@
-import { PostMetadata } from "@/interfaces/post";
+import { Post } from "@/interfaces/post";
 import { cache } from "react";
 import fs from "fs";
 import path from "path";
-import { MDXContent } from "mdx/types";
+import { getAllPostSlugs, getBlogPosts } from "../clients/contentful";
 
-type Post = {
-  metadata: PostMetadata;
-  content: React.ComponentType;
-};
+const DATA_DIR = path.join(process.cwd(), "data/posts");
 
-const postsDirectory = path.join(process.cwd(), "src/content/posts");
+export async function importPosts() {
+  const metadata = await getAllPostSlugs();
+  const slugs = metadata.map((m) => m.slug);
 
-const importPost = cache(async (slug: string): Promise<Post> => {
-  const { metadata, default: content } = await import(
-    `@/content/posts/${slug}.mdx`
-  );
-  return { metadata: { ...metadata, slug }, content };
+  const posts = await getBlogPosts(slugs);
+
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+
+  const imported = posts.map((post) => {
+    const filePath = path.join(DATA_DIR, `${post.slug}.json`);
+    fs.writeFileSync(filePath, JSON.stringify(post, null, 2));
+    return filePath;
+  });
+
+  return imported;
+}
+
+export const getAllPosts = cache(async (): Promise<Post[]> => {
+  if (!fs.existsSync(DATA_DIR)) return [];
+
+  const fileNames = fs.readdirSync(DATA_DIR);
+  const allPostsData = fileNames
+    .filter((fileName) => fileName.endsWith(".json"))
+    .map((fileName) => {
+      const filePath = path.join(DATA_DIR, fileName);
+      const fileContent = fs.readFileSync(filePath, "utf8");
+      return JSON.parse(fileContent) as Post;
+    });
+  if (allPostsData.length === 0) {
+    throw new Error(
+      "No posts found in the data directory. Need to run `npm run import`",
+    );
+  }
+
+  return allPostsData.sort((a, b) => (a.publishDate < b.publishDate ? 1 : -1));
 });
 
-export const getAllPostMetadata = cache(async (): Promise<PostMetadata[]> => {
-  const fileNames = fs.readdirSync(postsDirectory);
-  const allPostsData = await Promise.all(
-    fileNames
-      .filter((fileName) => fileName.endsWith(".mdx"))
-      .map(async (fileName) => {
-        const slug = fileName.replace(/\.mdx$/, "");
-        const { metadata } = await importPost(slug);
-
-        return metadata;
-      }),
-  );
-
-  return allPostsData.sort((a, b) => (a.date < b.date ? 1 : -1));
-});
-
-export const getRecentPosts = async (
-  count: number = 5,
-): Promise<PostMetadata[]> => {
-  const allPosts = await getAllPostMetadata();
+export const getRecentPosts = async (count: number = 5): Promise<Post[]> => {
+  const allPosts = await getAllPosts();
   return allPosts.slice(0, count);
 };
 
-export const getPostMetadataBySlug = async (
-  slug: string,
-): Promise<PostMetadata | null> => {
+export const getPostBySlug = async (slug: string): Promise<Post | null> => {
   try {
-    const { metadata } = await importPost(slug);
+    const filePath = path.join(DATA_DIR, `${slug}.json`);
+    if (!fs.existsSync(filePath)) return null;
 
-    return metadata;
+    const fileContent = fs.readFileSync(filePath, "utf8");
+    return JSON.parse(fileContent) as Post;
   } catch (error) {
     console.error(error);
     return null;
   }
-};
-
-export const getPostContent = async (slug: string): Promise<MDXContent> => {
-  const { content } = await importPost(slug);
-
-  return content as MDXContent;
 };

@@ -1,5 +1,5 @@
 import { Link } from "@/components/common/Link";
-import { PostMetadata } from "@/interfaces/post";
+import { Post } from "@/interfaces/post";
 import { Time } from "@/components/common/Time";
 import { Heading } from "@/components/common/Heading";
 import {
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/item";
 
 interface PostListProps {
-  posts: PostMetadata[];
+  posts: Post[];
   variant?: "default" | "compact";
 }
 
@@ -27,7 +27,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
                   <Heading as="h3">{post.title}</Heading>
                 </ItemTitle>
                 <ItemDescription className="text-sm text-gray-500">
-                  <Time dateTime={post.date} />
+                  <Time dateTime={post.publishDate} />
                 </ItemDescription>
               </ItemContent>
             </Link>
@@ -50,10 +50,10 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
               </Heading>
             </ItemTitle>
             <div className="text-sm text-gray-500 mb-3">
-              <Time dateTime={post.date} />
+              <Time dateTime={post.publishDate} />
             </div>
             <ItemDescription className="text-gray-700 line-clamp-3 dark:text-gray-300">
-              {post.excerpt}
+              {post.description}
             </ItemDescription>
           </ItemContent>
         </Item>

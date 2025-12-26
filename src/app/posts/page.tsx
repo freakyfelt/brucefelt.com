@@ -1,4 +1,4 @@
-import { getAllPostMetadata } from "@/lib/data/posts";
+import { getAllPosts } from "@/lib/data/posts";
 import { PostList } from "@/components/posts/PostList";
 import { PageContent } from "@/components/layout/PageContent";
 import { Heading } from "@/components/common/Heading";
@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function PostsPage() {
-  const posts = await getAllPostMetadata();
+  const posts = await getAllPosts();
 
   return (
     <PageContent>

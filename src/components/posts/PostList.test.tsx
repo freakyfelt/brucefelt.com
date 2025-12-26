@@ -7,14 +7,14 @@ const mockPosts: PostMetadata[] = [
   {
     title: "Test Post 1",
     slug: "test-post-1",
-    date: "2024-01-01",
-    excerpt: "Excerpt 1",
+    publishDate: "2024-01-01",
+    description: "Excerpt 1",
   },
   {
     title: "Test Post 2",
     slug: "test-post-2",
-    date: "2024-01-02",
-    excerpt: "Excerpt 2",
+    publishDate: "2024-01-02",
+    description: "Excerpt 2",
   },
 ];
 
