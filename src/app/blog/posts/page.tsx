@@ -4,7 +4,7 @@ import { PageContent } from "@/components/layout/PageContent";
 import { Heading } from "@/components/common/Heading";
 
 export const metadata = {
-  title: "Posts",
+  title: "Blog Posts",
 };
 
 export default async function BlogPostsPage() {
@@ -12,7 +12,7 @@ export default async function BlogPostsPage() {
 
   return (
     <PageContent>
-      <Heading as="h1">Posts</Heading>
+      <Heading as="h1">Blog Posts</Heading>
       <PostList posts={posts} />
     </PageContent>
   );
