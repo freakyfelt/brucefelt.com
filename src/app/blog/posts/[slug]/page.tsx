@@ -57,7 +57,7 @@ export default async function BlogPostPage({
             <PostTags tags={post.tags || []} />
           </div>
         </header>
-        <PostContent content={post.body} />
+        <PostContent content={post.content} />
       </article>
     </PageContent>
   );

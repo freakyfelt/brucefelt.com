@@ -1,6 +1,5 @@
-import { Post } from "@/interfaces/post";
+import { RawPost } from "@/interfaces/post";
 import { Tag } from "@/interfaces/tag";
-import { Document } from "@contentful/rich-text-types";
 
 const { CONTENTFUL_SPACE_ID, CONTENTFUL_ACCESS_TOKEN } = process.env;
 
@@ -39,9 +38,7 @@ query FetchBlogPosts($slugs: [String]) {
       heroImage {
         url(transform: {height: 1024})
       }
-      body {
-        json
-      }
+      content
     }
   }
 }
@@ -58,19 +55,17 @@ export type ContentfulPost = {
   heroImage?: {
     url: string;
   };
-  body: {
-    json: Document;
-  };
+  content: string;
 };
 
-const decodeContentfulPost = (post: ContentfulPost): Post => ({
+const decodeContentfulPost = (post: ContentfulPost): RawPost => ({
   title: post.title,
   slug: post.slug,
   publishDate: post.publishDate,
   description: post.description,
   tags: post.tagsCollection.items.map((tag) => tag.slug),
   heroImage: post.heroImage?.url,
-  body: post.body.json,
+  content: post.content,
 });
 
 async function fetchGraphQL(
@@ -142,7 +137,7 @@ export async function getAllPostSlugs(): Promise<PostMetadata[]> {
   });
 }
 
-export async function getBlogPosts(slugs: string[]): Promise<Post[]> {
+export async function getBlogPosts(slugs: string[]): Promise<RawPost[]> {
   return batchFetchGraphQL(POST_CONTENT_QUERY, { slugs }, 10, (data) => {
     const posts = data!.blogPostCollection!.items as ContentfulPost[];
     return posts.map(decodeContentfulPost);

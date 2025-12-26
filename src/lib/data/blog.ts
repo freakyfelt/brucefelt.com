@@ -1,14 +1,17 @@
-import { Post } from "@/interfaces/post";
+import { Post, RawPost } from "@/interfaces/post";
 import { cache } from "react";
-import path from "path";
 import { getAllPostSlugs, getBlogPosts } from "../clients/contentful";
 import { Tag } from "@/interfaces/tag";
-import { FilesystemStorage } from "../clients/filesystem";
+import {
+  JsonFilesystemStorage,
+  MarkdownFilesystemStorage,
+} from "../clients/filesystem";
 
-const DATA_DIR = path.join(process.cwd(), "data", "blog");
-
-const tagStorage = new FilesystemStorage<Tag>(path.join(DATA_DIR, "tags"));
-const postStorage = new FilesystemStorage<Post>(path.join(DATA_DIR, "posts"));
+const tagStorage = new JsonFilesystemStorage<Tag>("blog/tags");
+const postStorage = new MarkdownFilesystemStorage<RawPost, Post>({
+  basePath: "blog/posts",
+  importPrefix: "@data/blog/posts",
+});
 
 type ImportResults = {
   posts: string[];

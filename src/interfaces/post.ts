@@ -1,4 +1,4 @@
-import { Document } from "@contentful/rich-text-types";
+import { MDXContent } from "mdx/types";
 
 export type Post = {
   title: string;
@@ -8,5 +8,9 @@ export type Post = {
   description: string;
   tags: string[];
   heroImage?: string;
-  body: Document;
+  content: MDXContent;
+};
+
+export type RawPost = Omit<Post, "content"> & {
+  content: string;
 };
