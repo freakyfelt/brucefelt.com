@@ -1,9 +1,24 @@
 import type { MDXComponents } from "mdx/types";
 import { Heading } from "@/components/common/Heading";
 import { ExternalLink } from "@/components/common/Link";
+import { CodeBlock, InlineCode } from "@/components/common/Code";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
+    code: ({ children, className }) => {
+      if (typeof children !== "string") {
+        return <code>{children}</code>;
+      }
+
+      const isInline = !children.match(/\n/);
+      if (isInline) {
+        return <InlineCode>{children}</InlineCode>;
+      }
+
+      // ""```typescript" gets parsed by Rehype as "language-typescript"
+      const language = className?.replace(/language-/, "");
+      return <CodeBlock language={language}>{children}</CodeBlock>;
+    },
     h1: ({ children }) => <Heading as="h1">{children}</Heading>,
     h2: ({ children }) => <Heading as="h2">{children}</Heading>,
     h3: ({ children }) => <Heading as="h3">{children}</Heading>,

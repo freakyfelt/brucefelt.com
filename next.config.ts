@@ -16,12 +16,6 @@ const withMDX = createMDX({
       "remark-mdx-frontmatter",
       "remark-gfm",
       "remark-rehype",
-      ["@shikijs/rehype", {
-        themes: {
-          light: "github-light",
-          dark: "github-dark",
-        }
-      }],
     ],
   },
 });
