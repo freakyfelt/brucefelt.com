@@ -4,10 +4,10 @@ import { ExternalLink } from "@/components/common/Link";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    h1: ({ children }) => <Heading as="h2">{children}</Heading>,
-    h2: ({ children }) => <Heading as="h3">{children}</Heading>,
-    h3: ({ children }) => <Heading as="h4">{children}</Heading>,
-    h4: ({ children }) => <Heading as="h5">{children}</Heading>,
+    h1: ({ children }) => <Heading as="h1">{children}</Heading>,
+    h2: ({ children }) => <Heading as="h2">{children}</Heading>,
+    h3: ({ children }) => <Heading as="h3">{children}</Heading>,
+    h4: ({ children }) => <Heading as="h4">{children}</Heading>,
     p: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
     ul: ({ children }) => <ul className="list-disc pl-6 mb-2">{children}</ul>,
     ol: ({ children }) => <ol className="list-decimal pl-6">{children}</ol>,
@@ -18,7 +18,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </blockquote>
     ),
     a: ({ href, children }) => (
-      <ExternalLink href={href || ""}>{children}</ExternalLink>
+      <ExternalLink href={href}>{children}</ExternalLink>
     ),
     ...components,
   };
