@@ -6,7 +6,7 @@ import {
   SiBluesky,
   SiInstagram,
 } from "react-icons/si";
-import { Moon, Sun } from "lucide-react";
+import { LuSun, LuMoon } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
 export const ICONS = {
@@ -15,8 +15,8 @@ export const ICONS = {
   twitter: SiX,
   bluesky: SiBluesky,
   instagram: SiInstagram,
-  sun: Sun,
-  moon: Moon,
+  sun: LuSun,
+  moon: LuMoon,
 } as const;
 
 export type IconName = keyof typeof ICONS;
