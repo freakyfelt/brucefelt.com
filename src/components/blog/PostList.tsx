@@ -28,7 +28,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
                 <ItemTitle>
                   <Heading as="h3">{post.title}</Heading>
                 </ItemTitle>
-                <ItemDescription className="text-sm text-gray-500">
+                <ItemDescription className="text-sm text-muted-foreground">
                   <Time dateTime={post.publishDate} />
                 </ItemDescription>
               </ItemContent>
@@ -51,7 +51,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
                 </Link>
               </Heading>
             </ItemTitle>
-            <div className="text-sm text-gray-500 mb-3 flex justify-between items-center">
+            <div className="text-sm text-muted-foreground mb-3 flex justify-between items-center">
               <Time dateTime={post.publishDate} />
               <PostTags tags={post.tags || []} />
             </div>

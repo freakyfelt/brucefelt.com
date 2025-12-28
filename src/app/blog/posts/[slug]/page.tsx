@@ -32,6 +32,10 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+    },
   };
 }
 
@@ -52,7 +56,7 @@ export default async function BlogPostPage({
       <article>
         <header>
           <Heading as="h1">{post.title}</Heading>
-          <div className="border-b-1 border-gray-300 text-gray-500 text-sm pb-2 mb-4 dark:border-gray-700 flex justify-between items-center">
+          <div className="border-b border-border text-muted-foreground text-sm pb-2 mb-4 flex justify-between items-center">
             <Time dateTime={post.publishDate} />
             <PostTags tags={post.tags || []} />
           </div>

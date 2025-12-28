@@ -14,12 +14,12 @@ const LINK_CONFIGS: Record<SocialLinkTarget, LinkConfig> = {
   bluesky: {
     icon: SiBluesky,
     url: "https://bsky.app/profile/freakyfelt.bsky.social",
-    label: "Bluesky",
+    label: "Bluesky (freakyfelt.bsky.social)",
   },
   github: {
     icon: SiGithub,
     url: "https://github.com/freakyfelt",
-    label: "GitHub",
+    label: "GitHub (freakyfelt)",
   },
   linkedin: {
     icon: SiLinkedin,
@@ -29,7 +29,7 @@ const LINK_CONFIGS: Record<SocialLinkTarget, LinkConfig> = {
   twitter: {
     icon: SiX,
     url: "https://x.com/freakyfelt",
-    label: "Twitter (X)",
+    label: "Twitter (@freakyfelt)",
   },
 };
 
@@ -51,6 +51,7 @@ export function SocialLink({
       href={url}
       className={className}
       aria-label={label}
+      title={label}
       variant={variant}
     >
       <Icon className="h-5 w-5" />
