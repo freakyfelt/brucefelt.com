@@ -20,10 +20,12 @@ export const metadata: Metadata = {
     template: "%s - The Felt Facade",
     default: "The Felt Facade",
   },
-  description: "Bruce Felt's corner of the internet with dev musings, photography, and personal projects",
+  description:
+    "Bruce Felt's corner of the internet with dev musings, photography, and personal projects",
   openGraph: {
     title: "The Felt Facade",
-    description: "Bruce Felt's corner of the internet with dev musings, photography, and personal projects",
+    description:
+      "Bruce Felt's corner of the internet with dev musings, photography, and personal projects",
     url: "https://brucefelt.com",
     siteName: "The Felt Facade",
     images: [

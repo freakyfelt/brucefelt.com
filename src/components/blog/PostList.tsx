@@ -25,9 +25,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
           <Item key={post.slug} variant="outline" size="sm" asChild>
             <Link path={paths.blogPost(post.slug)} variant="heading">
               <ItemContent>
-                <ItemTitle>
-                  <Heading as="h3">{post.title}</Heading>
-                </ItemTitle>
+                <ItemTitle>{post.title}</ItemTitle>
                 <ItemDescription className="text-sm text-muted-foreground">
                   <Time dateTime={post.publishDate} />
                 </ItemDescription>
