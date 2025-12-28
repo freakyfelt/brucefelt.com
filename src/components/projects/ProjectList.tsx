@@ -8,7 +8,7 @@ import {
   ItemMedia,
 } from "@/components/ui/item";
 import { Project } from "@/interfaces/project";
-import { SiGithub } from "react-icons/si";
+import { Icon } from "@/components/common/Icon";
 
 interface ProjectListProps {
   projects: Project[];
@@ -27,7 +27,7 @@ export function ProjectList({ projects }: ProjectListProps) {
           >
             {project.icon === "github" && (
               <ItemMedia variant="icon">
-                <SiGithub />
+                <Icon name="github" />
               </ItemMedia>
             )}
             <ItemContent>

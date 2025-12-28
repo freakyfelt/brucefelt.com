@@ -1,37 +1,47 @@
 import React from "react";
-import { SiGithub, SiLinkedin, SiX, SiBluesky } from "react-icons/si";
 import { ExternalLink, type ExternalLinkProps } from "@/components/common/Link";
+import { Icon, type IconName } from "@/components/common/Icon";
 
-export type SocialLinkTarget = "github" | "twitter" | "bluesky" | "linkedin";
+export type SocialLinkTarget =
+  | "github"
+  | "twitter"
+  | "bluesky"
+  | "linkedin"
+  | "instagram";
 
 interface LinkConfig {
-  icon: React.ElementType;
+  icon: IconName;
   url: string;
   label: string;
 }
 
 const LINK_CONFIGS: Record<SocialLinkTarget, LinkConfig> = {
   bluesky: {
-    icon: SiBluesky,
+    icon: "bluesky",
     url: "https://bsky.app/profile/freakyfelt.bsky.social",
     label: "Bluesky (freakyfelt.bsky.social)",
   },
   github: {
-    icon: SiGithub,
+    icon: "github",
     url: "https://github.com/freakyfelt",
     label: "GitHub (freakyfelt)",
   },
   linkedin: {
-    icon: SiLinkedin,
+    icon: "linkedin",
     url: "https://linkedin.com/in/brucefelt",
     label: "LinkedIn",
   },
   twitter: {
-    icon: SiX,
+    icon: "twitter",
     url: "https://x.com/freakyfelt",
     label: "Twitter (@freakyfelt)",
   },
-};
+  instagram: {
+    icon: "instagram",
+    url: "https://instagram.com/freakyfelt",
+    label: "Instagram (@freakyfelt)",
+  },
+} as const;
 
 interface SocialLinkProps {
   target: SocialLinkTarget;
@@ -44,7 +54,7 @@ export function SocialLink({
   className,
   variant = "none",
 }: SocialLinkProps) {
-  const { icon: Icon, url, label } = LINK_CONFIGS[target];
+  const { icon, url, label } = LINK_CONFIGS[target];
 
   return (
     <ExternalLink
@@ -54,7 +64,7 @@ export function SocialLink({
       title={label}
       variant={variant}
     >
-      <Icon className="h-5 w-5" />
+      <Icon name={icon} className="h-5 w-5" />
     </ExternalLink>
   );
 }

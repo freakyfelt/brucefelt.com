@@ -22,6 +22,7 @@ export function Footer() {
           <SocialLink target="linkedin" variant="nav" />
           <SocialLink target="bluesky" variant="nav" />
           <SocialLink target="twitter" variant="nav" />
+          <SocialLink target="instagram" variant="nav" />
         </div>
       </div>
     </footer>
