@@ -82,7 +82,7 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
     }
 
     this.listFiles().forEach((file) => {
-      fs.unlinkSync(file.path);
+      fs.unlinkSync(file.absolutePath);
     });
   }
 
