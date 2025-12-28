@@ -20,13 +20,13 @@ interface PostListProps {
 export function PostList({ posts, variant = "default" }: PostListProps) {
   if (variant === "compact") {
     return (
-      <ItemGroup className="gap-4" aria-label="Compact post list">
+      <ItemGroup aria-label="Compact post list">
         {posts.map((post) => (
-          <Item key={post.slug} variant="outline" size="sm" asChild>
-            <Link path={paths.blogPost(post.slug)} variant="heading">
+          <Item key={post.slug} asChild>
+            <Link path={paths.blogPost(post.slug)} variant="none">
               <ItemContent>
                 <ItemTitle>{post.title}</ItemTitle>
-                <ItemDescription className="text-sm text-muted-foreground">
+                <ItemDescription>
                   <Time dateTime={post.publishDate} />
                 </ItemDescription>
               </ItemContent>
@@ -53,7 +53,7 @@ export function PostList({ posts, variant = "default" }: PostListProps) {
               <Time dateTime={post.publishDate} />
               <PostTags tags={post.tags || []} />
             </div>
-            <ItemDescription className="text-gray-700 line-clamp-3 dark:text-gray-300">
+            <ItemDescription className="text-foreground">
               {post.description}
             </ItemDescription>
           </ItemContent>

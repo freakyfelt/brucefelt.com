@@ -13,13 +13,14 @@ import { ExternalLink } from "../common/Link";
 
 interface ProjectListProps {
   projects: Project[];
+  variant?: "default" | "outline";
 }
 
-export function ProjectList({ projects }: ProjectListProps) {
+export function ProjectList({ projects, variant }: ProjectListProps) {
   return (
-    <ItemGroup className="gap-4" aria-label="Project list">
+    <ItemGroup aria-label="Project list">
       {projects.map((project) => (
-        <Item key={project.name} variant="outline" size="sm" asChild>
+        <Item key={project.name} variant={variant} asChild>
           <ExternalLink href={project.url} variant="none">
             {project.icon === "github" && (
               <ItemMedia variant="icon">
@@ -28,9 +29,7 @@ export function ProjectList({ projects }: ProjectListProps) {
             )}
             <ItemContent>
               <ItemTitle>{project.name}</ItemTitle>
-              <ItemDescription className="text-sm text-muted-foreground">
-                {project.description}
-              </ItemDescription>
+              <ItemDescription>{project.description}</ItemDescription>
             </ItemContent>
           </ExternalLink>
         </Item>
