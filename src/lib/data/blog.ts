@@ -1,17 +1,7 @@
-import { Post, RawPost } from "@/interfaces/post";
+import { Post } from "@/interfaces/post";
 import { cache } from "react";
-import { getAllPostSlugs, getBlogPosts } from "../clients/contentful";
 import { Tag } from "@/interfaces/tag";
-import {
-  JsonFilesystemStorage,
-  MarkdownFilesystemStorage,
-} from "../clients/filesystem";
-
-const tagStorage = new JsonFilesystemStorage<Tag>("blog/tags");
-const postStorage = new MarkdownFilesystemStorage<RawPost, Post>({
-  basePath: "blog/posts",
-  importPrefix: "@data/blog/posts",
-});
+import { appContext } from "@/lib/app/context";
 
 type ImportResults = {
   posts: string[];
@@ -19,9 +9,10 @@ type ImportResults = {
 };
 
 export async function importPosts(): Promise<ImportResults> {
-  const metadata = await getAllPostSlugs();
+  const metadata = await appContext.stores.contentfulBlog.getAllPostSlugs();
   const slugs = metadata.map((m) => m.slug);
-  const posts = await getBlogPosts(slugs);
+  const posts = await appContext.stores.contentfulBlog.getBlogPosts(slugs);
+
   const tagsBySlug = metadata.reduce((acc, m) => {
     m.tags.forEach((tag) => {
       acc.set(tag.slug, tag);
@@ -31,14 +22,18 @@ export async function importPosts(): Promise<ImportResults> {
 
   const tags = Array.from(tagsBySlug.values());
 
-  const tagPaths = await tagStorage.writeAll(tags, { deleteExisting: true });
-  const postPaths = await postStorage.writeAll(posts, { deleteExisting: true });
+  const tagPaths = await appContext.stores.tags.writeAll(tags, {
+    deleteExisting: true,
+  });
+  const postPaths = await appContext.stores.posts.writeAll(posts, {
+    deleteExisting: true,
+  });
 
   return { posts: postPaths, tags: tagPaths };
 }
 
 export const getAllPosts = cache(async (): Promise<Post[]> => {
-  const allPostsData = await postStorage.readAll();
+  const allPostsData = await appContext.stores.posts.readAll();
   if (allPostsData.length === 0) {
     throw new Error(
       "No posts found in the data directory. Need to run `npm run import`",
@@ -49,7 +44,7 @@ export const getAllPosts = cache(async (): Promise<Post[]> => {
 });
 
 export const getAllTags = async (): Promise<Tag[]> => {
-  const allTagsData = await tagStorage.readAll();
+  const allTagsData = await appContext.stores.tags.readAll();
   if (allTagsData.length === 0) {
     throw new Error(
       "No tags found in the data directory. Need to run `npm run import`",

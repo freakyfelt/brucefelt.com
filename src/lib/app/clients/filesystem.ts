@@ -2,8 +2,6 @@ import fs from "fs";
 import path from "path";
 import Yaml from "yaml";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-
 type HasSlug = {
   slug: string;
 };
@@ -16,30 +14,64 @@ type WriteOptions = {
   deleteExisting?: boolean;
 };
 
-type BaseFilesystemStorageConfig = {
-  basePath: string;
-  extension: string;
-};
-
 type File = {
   slug: string;
   name: string;
   /** fully qualified path */
   absolutePath: string;
-  /** Path relative to DATA_DIR */
+  /** Path relative to the rootDir */
   path: string;
   text(): Promise<string>;
 };
 
+export type StorageConfig = {
+  rootDir: string;
+};
+
+export class FilesystemStorage {
+  constructor(private config: StorageConfig) {}
+
+  forJSON<T extends HasSlug>(
+    config: Omit<JsonFilesystemStorageConfig, "rootDir">,
+  ) {
+    return new JsonFilesystemStorage<T>({
+      rootDir: this.config.rootDir,
+      ...config,
+    });
+  }
+
+  forMarkdown<TRaw extends HasSlug & HasContent, T extends HasSlug>(
+    config: Omit<MarkdownFilesystemStorageConfig, "rootDir">,
+  ) {
+    return new MarkdownFilesystemStorage<TRaw, T>({
+      rootDir: this.config.rootDir,
+      ...config,
+    });
+  }
+}
+
+type BaseFilesystemStorageConfig = {
+  /** the directory where all data is stored */
+  rootDir: string;
+
+  /** the subdirectory for all documents for this collection */
+  pathPrefix: string;
+
+  /** the file extension for all documents for this collection */
+  extension: string;
+};
+
+const PATH_PREFIX_RE = new RegExp("[A-z0-9][a-z0-9\\-\\_\\/]*");
+
 class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
   private readonly basePath: string;
   constructor(private config: BaseFilesystemStorageConfig) {
-    if (config.basePath.startsWith(process.cwd())) {
+    if (!PATH_PREFIX_RE.test(config.pathPrefix)) {
       throw new Error(
-        `basePath must be relative to DATA_DIR (received ${config.basePath})`,
+        `pathPrefix must be relative to DATA_DIR (received ${config.pathPrefix})`,
       );
     }
-    this.basePath = path.join(DATA_DIR, config.basePath);
+    this.basePath = path.join(config.rootDir, config.pathPrefix);
   }
 
   async readAll(): Promise<T[]> {
@@ -103,7 +135,7 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
 
     return fileNames.map((fileName) => {
       const slug = fileName.replace(`.${this.config.extension}`, "");
-      const filePath = path.join(this.config.basePath, fileName);
+      const filePath = path.join(this.config.pathPrefix, fileName);
       const absolutePath = path.join(this.basePath, fileName);
       return {
         slug,
@@ -130,6 +162,11 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
   }
 }
 
+export type JsonFilesystemStorageConfig = Omit<
+  BaseFilesystemStorageConfig,
+  "extension"
+>;
+
 /**
  * Handles reading and writing JSON to the filesystem
  *
@@ -138,10 +175,10 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
 export class JsonFilesystemStorage<
   T extends HasSlug,
 > extends BaseFilesystemStorage<T, T> {
-  constructor(basePath: string) {
+  constructor(jsonConfig: JsonFilesystemStorageConfig) {
     super({
-      basePath,
       extension: "json",
+      ...jsonConfig,
     });
   }
 
@@ -155,10 +192,10 @@ export class JsonFilesystemStorage<
   }
 }
 
-type MarkdownFilesystemStorageConfig = {
-  basePath: string;
-  importPrefix: string;
-};
+type MarkdownFilesystemStorageConfig = Omit<
+  BaseFilesystemStorageConfig,
+  "extension"
+>;
 
 /**
  * Outputs a markdown file with frontmatter
@@ -169,8 +206,8 @@ export class MarkdownFilesystemStorage<
 > extends BaseFilesystemStorage<T, TRaw> {
   constructor(private mdConfig: MarkdownFilesystemStorageConfig) {
     super({
-      basePath: mdConfig.basePath,
       extension: "md",
+      ...mdConfig,
     });
   }
   protected async encodeItem(item: TRaw): Promise<string> {
