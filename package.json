@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "deploy": "npm run import && npm run build",
     "start": "next start",
     "clean": "rm -rf out",
     "format": "eslint --fix . && prettier --write .",
