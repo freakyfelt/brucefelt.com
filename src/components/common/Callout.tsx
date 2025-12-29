@@ -40,7 +40,9 @@ export function Callout({
     <Alert className={cn("mb-6", variantClassName, className)}>
       <Icon name={iconName} />
       {title && <AlertTitle>{title}</AlertTitle>}
-      <AlertDescription>{children}</AlertDescription>
+      <AlertDescription className="[&_p:last-child]:mb-0">
+        {children}
+      </AlertDescription>
     </Alert>
   );
 }
