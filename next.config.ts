@@ -4,7 +4,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   output: "export",
-  pageExtensions: ["js", "jsx", "ts", "tsx", "md"],
+  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+  images: {
+    unoptimized: true,
+  },
 };
 
 const withMDX = createMDX({
@@ -15,7 +18,6 @@ const withMDX = createMDX({
       "remark-frontmatter",
       "remark-mdx-frontmatter",
       "remark-gfm",
-      "remark-rehype",
     ],
   },
 });

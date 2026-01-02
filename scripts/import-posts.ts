@@ -1,4 +1,5 @@
-import { importPosts } from "@/lib/data/blog";
+import "dotenv/config";
+import { importPosts } from "@/lib/app/tasks/import-posts";
 
 importPosts()
   .then((imported) => {

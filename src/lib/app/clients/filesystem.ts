@@ -84,6 +84,20 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
     return Promise.all(allData);
   }
 
+  async read(slug: string): Promise<T | null> {
+    this.assertBasePath();
+
+    if (!slug) {
+      throw new Error("slug is required");
+    }
+
+    const file = this.getFile(slug);
+    if (!file) {
+      return null;
+    }
+    return this.decodeItem(file);
+  }
+
   /** writes all items to the filesystem and returns the list of paths */
   async writeAll(
     items: TRaw[],
@@ -126,6 +140,21 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected encodeItem(_item: TRaw): Promise<string> {
     throw new Error("Method not implemented.");
+  }
+
+  private getFile(slug: string): File | null {
+    const fileName = `${slug}.${this.config.extension}`;
+    const filePath = path.join(this.basePath, fileName);
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+    return {
+      slug,
+      name: fileName,
+      absolutePath: filePath,
+      path: path.join(this.config.pathPrefix, fileName),
+      text: async () => fs.readFileSync(filePath, "utf8"),
+    };
   }
 
   private listFiles(): File[] {
@@ -206,7 +235,7 @@ export class MarkdownFilesystemStorage<
 > extends BaseFilesystemStorage<T, TRaw> {
   constructor(private mdConfig: MarkdownFilesystemStorageConfig) {
     super({
-      extension: "md",
+      extension: "mdx",
       ...mdConfig,
     });
   }

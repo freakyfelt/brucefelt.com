@@ -7,6 +7,7 @@ export const post1: Post = {
   description: "Excerpt 1",
   tags: ["tag1", "tag2"],
   content: () => {},
+  status: "active",
 };
 
 export const post2: Post = {
@@ -16,4 +17,5 @@ export const post2: Post = {
   description: "Excerpt 2",
   tags: ["tag1", "tag3"],
   content: () => {},
+  status: "active",
 };

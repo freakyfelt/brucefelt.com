@@ -1,3 +1,4 @@
+import "dotenv/config";
 import path from "path";
 import { FilesystemStorage, StorageConfig } from "./clients/filesystem";
 import {
@@ -7,6 +8,7 @@ import {
 import { Post, RawPost } from "@/interfaces/post";
 import { Tag } from "@/interfaces/tag";
 import { ContentfulBlogStore } from "./stores/contentful-blog";
+import { ImageAsset } from "@/interfaces/image-asset";
 
 export type AppConfig = {
   contentful: ContentfulConfig;
@@ -33,10 +35,13 @@ export function createAppContext(config: AppConfig) {
 
   const stores = {
     contentfulBlog: new ContentfulBlogStore(clients.contentful),
-    posts: clients.storage.forMarkdown<RawPost, Post>({
+    blogPosts: clients.storage.forMarkdown<RawPost, Post>({
       pathPrefix: "blog/posts",
     }),
-    tags: clients.storage.forJSON<Tag>({ pathPrefix: "blog/tags" }),
+    blogTags: clients.storage.forJSON<Tag>({ pathPrefix: "blog/tags" }),
+    imageAssets: clients.storage.forJSON<ImageAsset>({
+      pathPrefix: "assets/images",
+    }),
   };
 
   return { config, clients, stores };
