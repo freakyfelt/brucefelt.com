@@ -36,21 +36,13 @@ export async function ContentfulImage({
     : asset.large;
 
   return (
-    <div
-      className="relative mx-auto overflow-hidden rounded-lg border bg-muted"
-      style={{
-        height: "500px",
-        aspectRatio: `${asset.width} / ${asset.height}`,
-      }}
-    >
-      <Image
-        src={src}
-        alt={asset.title || asset.description || ""}
-        fill
-        className={className}
-        sizes={sizes}
-        priority={priority}
-      />
-    </div>
+    <Image
+      src={src}
+      alt={asset.title || asset.description || ""}
+      fill
+      className={className}
+      sizes={sizes}
+      priority={priority}
+    />
   );
 }
