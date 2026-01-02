@@ -5,6 +5,10 @@ import { CodeBlock, InlineCode } from "@/components/common/Code";
 import { Blockquote } from "@/components/mdx/blockquote";
 import { Callout } from "@/components/common/Callout";
 import { CalloutTypeHandlers } from "@/components/mdx/callout";
+import {
+  ImageCarousel,
+  ImageCarouselItem,
+} from "@/components/images/ImageCarousel";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -43,6 +47,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     a: ({ href, children }) => (
       <ExternalLink href={href}>{children}</ExternalLink>
     ),
+    ImageCarousel,
+    ImageCarouselItem,
     ...components,
   };
 }

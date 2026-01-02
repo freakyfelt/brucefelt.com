@@ -84,6 +84,14 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
     return Promise.all(allData);
   }
 
+  async read(slug: string): Promise<T | null> {
+    const file = this.listFiles().find((f) => f.slug === slug);
+    if (!file) {
+      return null;
+    }
+    return this.decodeItem(file);
+  }
+
   /** writes all items to the filesystem and returns the list of paths */
   async writeAll(
     items: TRaw[],
@@ -206,7 +214,7 @@ export class MarkdownFilesystemStorage<
 > extends BaseFilesystemStorage<T, TRaw> {
   constructor(private mdConfig: MarkdownFilesystemStorageConfig) {
     super({
-      extension: "md",
+      extension: "mdx",
       ...mdConfig,
     });
   }
