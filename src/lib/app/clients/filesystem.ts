@@ -85,7 +85,13 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
   }
 
   async read(slug: string): Promise<T | null> {
-    const file = this.listFiles().find((f) => f.slug === slug);
+    this.assertBasePath();
+
+    if (!slug) {
+      throw new Error("slug is required");
+    }
+
+    const file = this.getFile(slug);
     if (!file) {
       return null;
     }
@@ -134,6 +140,21 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected encodeItem(_item: TRaw): Promise<string> {
     throw new Error("Method not implemented.");
+  }
+
+  private getFile(slug: string): File | null {
+    const fileName = `${slug}.${this.config.extension}`;
+    const filePath = path.join(this.basePath, fileName);
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+    return {
+      slug,
+      name: fileName,
+      absolutePath: filePath,
+      path: path.join(this.config.pathPrefix, fileName),
+      text: async () => fs.readFileSync(filePath, "utf8"),
+    };
   }
 
   private listFiles(): File[] {
