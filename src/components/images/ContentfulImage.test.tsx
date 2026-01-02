@@ -9,12 +9,24 @@ vi.mock("next/image", () => ({
     src,
     alt,
     className,
+    width,
+    height,
   }: {
     src: string;
     alt: string;
     className: string;
-  // eslint-disable-next-line @next/next/no-img-element
-  }) => <img src={src} alt={alt} className={className} />,
+    width: number;
+    height: number;
+  }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      width={width}
+      height={height}
+    />
+  ),
 }));
 
 // Mock getImageById
@@ -30,8 +42,7 @@ describe("ContentfulImage", () => {
     contentType: "image/webp",
     width: 1000,
     height: 500,
-    medium: "//images.ctfassets.net/space/test-id/v1/medium.webp",
-    large: "//images.ctfassets.net/space/test-id/v1/large.webp",
+    url: "//images.ctfassets.net/space/test-id/v1/image.webp",
   };
 
   it("should render an image with the correct src and alt when asset is provided", async () => {
@@ -40,9 +51,11 @@ describe("ContentfulImage", () => {
 
     const img = screen.getByRole("img");
     expect(img.getAttribute("src")).toBe(
-      "https://images.ctfassets.net/space/test-id/v1/large.webp",
+      "https://images.ctfassets.net/space/test-id/v1/image.webp?h=1000&q=75&fm=webp",
     );
     expect(img.getAttribute("alt")).toBe("Test Title");
+    expect(img.getAttribute("width")).toBe("2000");
+    expect(img.getAttribute("height")).toBe("1000");
   });
 
   it("should use description as alt if title is missing", async () => {

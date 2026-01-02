@@ -5,6 +5,5 @@ export type ImageAsset = {
   contentType: string;
   width: number;
   height: number;
-  medium: string;
-  large: string;
+  url: string;
 };

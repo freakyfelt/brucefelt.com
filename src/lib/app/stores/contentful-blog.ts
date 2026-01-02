@@ -32,8 +32,7 @@ query FetchImageAssets($ids: [String], $limit: Int, $skip: Int = 0) {
       contentType
       width
       height
-      medium: url(transform: {height: 600})
-      large: url(transform: {height: 1000})
+      url
     }
   }
 }
@@ -97,8 +96,7 @@ type RawImageAsset = {
   contentType: string;
   width: number;
   height: number;
-  medium: string;
-  large: string;
+  url: string;
 };
 
 const decodeContentfulImage = (asset: RawImageAsset): ImageAsset => ({
@@ -108,8 +106,7 @@ const decodeContentfulImage = (asset: RawImageAsset): ImageAsset => ({
   contentType: asset.contentType,
   width: asset.width,
   height: asset.height,
-  medium: asset.medium,
-  large: asset.large,
+  url: asset.url,
 });
 
 type PostMetadata = {

@@ -17,15 +17,8 @@ export async function ImageCarouselItem({ assetId }: { assetId: string }) {
   return (
     <CarouselItem className="basis-1/3">
       <figure className="flex flex-col h-full">
-        <div
-          className="relative mx-auto overflow-hidden rounded-lg border bg-muted max-w-full"
-          style={{
-            height: "500px",
-            width: "auto",
-            aspectRatio: `${asset.width} / ${asset.height}`,
-          }}
-        >
-          <ContentfulImage asset={asset} className="object-contain" />
+        <div className="mx-auto w-fit max-w-full overflow-hidden rounded-lg border bg-muted">
+          <ContentfulImage asset={asset} height={500} />
         </div>
         {(asset.title || asset.description) && (
           <figcaption className="mt-2 text-center text-sm text-muted-foreground">
