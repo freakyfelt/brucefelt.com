@@ -15,7 +15,7 @@ export async function ImageCarouselItem({ assetId }: { assetId: string }) {
   if (!asset) return null;
 
   return (
-    <CarouselItem className="basis-1/3">
+    <CarouselItem>
       <figure className="flex flex-col h-full">
         <div className="mx-auto w-fit max-w-full overflow-hidden rounded-lg border bg-muted">
           <ContentfulImage asset={asset} height={500} />
