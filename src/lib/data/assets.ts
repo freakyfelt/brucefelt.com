@@ -4,5 +4,5 @@ import { appContext } from "@/lib/app/context";
 export const getImageById = async (
   assetId: string,
 ): Promise<ImageAsset | null> => {
-  return appContext.stores.contentfulAssets.read(assetId);
+  return appContext.stores.imageAssets.read(assetId);
 };

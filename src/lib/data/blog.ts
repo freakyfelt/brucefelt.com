@@ -5,7 +5,7 @@ import { appContext } from "@/lib/app/context";
 
 export const getAllPosts = cache(
   async (options?: { includeNonActive?: boolean }): Promise<Post[]> => {
-    const allPostsData = await appContext.stores.posts.readAll();
+    const allPostsData = await appContext.stores.blogPosts.readAll();
     if (allPostsData.length === 0) {
       throw new Error(
         "No posts found in the data directory. Need to run `npm run import`",
@@ -21,7 +21,7 @@ export const getAllPosts = cache(
 );
 
 export const getAllTags = async (): Promise<Tag[]> => {
-  const allTagsData = await appContext.stores.tags.readAll();
+  const allTagsData = await appContext.stores.blogTags.readAll();
   if (allTagsData.length === 0) {
     throw new Error(
       "No tags found in the data directory. Need to run `npm run import`",

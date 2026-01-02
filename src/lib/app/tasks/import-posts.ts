@@ -24,7 +24,7 @@ export async function importPosts(): Promise<ImportResults> {
   const assets = await appContext.stores.contentfulBlog.getAssets(
     Array.from(allAssetIds),
   );
-  await appContext.stores.contentfulAssets.writeAll(assets, {
+  await appContext.stores.imageAssets.writeAll(assets, {
     deleteExisting: true,
   });
 
@@ -37,10 +37,10 @@ export async function importPosts(): Promise<ImportResults> {
 
   const tags = Array.from(tagsBySlug.values());
 
-  const tagPaths = await appContext.stores.tags.writeAll(tags, {
+  const tagPaths = await appContext.stores.blogTags.writeAll(tags, {
     deleteExisting: true,
   });
-  const postPaths = await appContext.stores.posts.writeAll(posts, {
+  const postPaths = await appContext.stores.blogPosts.writeAll(posts, {
     deleteExisting: true,
   });
 

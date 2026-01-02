@@ -34,14 +34,14 @@ export function createAppContext(config: AppConfig) {
   };
 
   const stores = {
-    contentfulAssets: clients.storage.forJSON<ImageAsset>({
-      pathPrefix: "assets",
-    }),
     contentfulBlog: new ContentfulBlogStore(clients.contentful),
-    posts: clients.storage.forMarkdown<RawPost, Post>({
+    blogPosts: clients.storage.forMarkdown<RawPost, Post>({
       pathPrefix: "blog/posts",
     }),
-    tags: clients.storage.forJSON<Tag>({ pathPrefix: "blog/tags" }),
+    blogTags: clients.storage.forJSON<Tag>({ pathPrefix: "blog/tags" }),
+    imageAssets: clients.storage.forJSON<ImageAsset>({
+      pathPrefix: "assets/images",
+    }),
   };
 
   return { config, clients, stores };
