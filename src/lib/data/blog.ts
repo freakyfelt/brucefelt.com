@@ -32,16 +32,22 @@ export async function importPosts(): Promise<ImportResults> {
   return { posts: postPaths, tags: tagPaths };
 }
 
-export const getAllPosts = cache(async (): Promise<Post[]> => {
-  const allPostsData = await appContext.stores.posts.readAll();
-  if (allPostsData.length === 0) {
-    throw new Error(
-      "No posts found in the data directory. Need to run `npm run import`",
-    );
-  }
+export const getAllPosts = cache(
+  async (options?: { includeNonActive?: boolean }): Promise<Post[]> => {
+    const allPostsData = await appContext.stores.posts.readAll();
+    if (allPostsData.length === 0) {
+      throw new Error(
+        "No posts found in the data directory. Need to run `npm run import`",
+      );
+    }
 
-  return allPostsData.sort((a, b) => (a.publishDate < b.publishDate ? 1 : -1));
-});
+    const posts = options?.includeNonActive
+      ? allPostsData
+      : allPostsData.filter((post) => post.status === "active");
+
+    return posts.sort((a, b) => (a.publishDate < b.publishDate ? 1 : -1));
+  },
+);
 
 export const getAllTags = async (): Promise<Tag[]> => {
   const allTagsData = await appContext.stores.tags.readAll();
@@ -67,7 +73,7 @@ export const getRecentPosts = async (count: number = 5): Promise<Post[]> => {
 };
 
 export const getPostBySlug = async (slug: string): Promise<Post | null> => {
-  const posts = await getAllPosts();
+  const posts = await getAllPosts({ includeNonActive: true });
 
   return posts.find((post) => post.slug === slug) || null;
 };

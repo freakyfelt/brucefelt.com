@@ -3,7 +3,7 @@ import { paths } from "@/lib/utils/url";
 import { permanentRedirect } from "next/navigation";
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
+  const posts = await getAllPosts({ includeNonActive: true });
   return posts.map((post) => ({
     slug: post.slug,
   }));

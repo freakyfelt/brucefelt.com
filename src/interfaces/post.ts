@@ -1,5 +1,7 @@
 import { MDXContent } from "mdx/types";
 
+export type PostStatus = "active" | "archived" | "draft";
+
 export type Post = {
   title: string;
   slug: string;
@@ -9,6 +11,7 @@ export type Post = {
   tags: string[];
   heroImage?: string;
   content: MDXContent;
+  status: PostStatus;
 };
 
 export type RawPost = Omit<Post, "content"> & {

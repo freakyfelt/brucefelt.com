@@ -1,4 +1,4 @@
-import { RawPost } from "@/interfaces/post";
+import { PostStatus, RawPost } from "@/interfaces/post";
 import { Tag } from "@/interfaces/tag";
 import { ContentfulGraphQLClient } from "../clients/contentful";
 
@@ -29,6 +29,7 @@ query FetchBlogPosts($slugs: [String]) {
       title
       description
       publishDate
+      status
       tagsCollection(limit: 10) {
         items {
           slug
@@ -48,6 +49,7 @@ export type ContentfulPost = {
   title: string;
   description: string;
   publishDate: string;
+  status?: string;
   tagsCollection: {
     items: Tag[];
   };
@@ -65,6 +67,7 @@ const decodeContentfulPost = (post: ContentfulPost): RawPost => ({
   tags: post.tagsCollection.items.map((tag) => tag.slug),
   heroImage: post.heroImage?.url,
   content: post.content,
+  status: (post.status as PostStatus) || "active",
 });
 
 type PostMetadata = {

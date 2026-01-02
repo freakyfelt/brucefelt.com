@@ -6,9 +6,10 @@ import { PageContent } from "@/components/layout/PageContent";
 import { Heading } from "@/components/common/Heading";
 import { PostContent } from "@/components/blog/PostContent";
 import { PostTags } from "@/components/blog/PostTags";
+import { ArchivedBanner } from "@/components/blog/ArchivedBanner";
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
+  const posts = await getAllPosts({ includeNonActive: true });
 
   return posts.map((post) => ({
     slug: post.slug,
@@ -60,6 +61,7 @@ export default async function BlogPostPage({
             <Time dateTime={post.publishDate} />
             <PostTags tags={post.tags || []} />
           </div>
+          {post.status === "archived" && <ArchivedBanner />}
         </header>
         <PostContent content={post.content} />
       </article>

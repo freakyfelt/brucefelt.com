@@ -9,6 +9,7 @@ interface CalloutProps {
   title?: string;
   children: React.ReactNode;
   variant?: CalloutVariant;
+  icon?: IconName;
   className?: string;
 }
 
@@ -32,17 +33,21 @@ export function Callout({
   title,
   children,
   variant = "info",
+  icon,
   className,
 }: CalloutProps) {
-  const { className: variantClassName, iconName } = VARIANT_CONFIG[variant];
+  const { className: variantClassName, iconName: defaultIconName } =
+    VARIANT_CONFIG[variant];
 
   return (
     <Alert className={cn("mb-6", variantClassName, className)}>
-      <Icon name={iconName} />
+      <Icon name={icon || defaultIconName} />
       {title && <AlertTitle>{title}</AlertTitle>}
-      <AlertDescription className="[&_p:last-child]:mb-0">
-        {children}
-      </AlertDescription>
+      {children && (
+        <AlertDescription className="[&_p:last-child]:mb-0">
+          {children}
+        </AlertDescription>
+      )}
     </Alert>
   );
 }

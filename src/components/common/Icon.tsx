@@ -6,7 +6,13 @@ import {
   SiBluesky,
   SiInstagram,
 } from "react-icons/si";
-import { LuSun, LuMoon, LuTriangleAlert, LuInfo } from "react-icons/lu";
+import {
+  LuSun,
+  LuMoon,
+  LuTriangleAlert,
+  LuInfo,
+  LuPackage,
+} from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
 export const ICONS = {
@@ -19,6 +25,7 @@ export const ICONS = {
   moon: LuMoon,
   info: LuInfo,
   warning: LuTriangleAlert,
+  package: LuPackage,
 } as const;
 
 export type IconName = keyof typeof ICONS;
