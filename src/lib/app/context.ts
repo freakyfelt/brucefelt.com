@@ -8,7 +8,7 @@ import {
 import { Post, RawPost } from "@/interfaces/post";
 import { Tag } from "@/interfaces/tag";
 import { ContentfulBlogStore } from "./stores/contentful-blog";
-import { Asset } from "@/interfaces/asset";
+import { ImageAsset } from "@/interfaces/image-asset";
 
 export type AppConfig = {
   contentful: ContentfulConfig;
@@ -34,7 +34,7 @@ export function createAppContext(config: AppConfig) {
   };
 
   const stores = {
-    contentfulAssets: clients.storage.forJSON<Asset>({
+    contentfulAssets: clients.storage.forJSON<ImageAsset>({
       pathPrefix: "assets",
     }),
     contentfulBlog: new ContentfulBlogStore(clients.contentful),

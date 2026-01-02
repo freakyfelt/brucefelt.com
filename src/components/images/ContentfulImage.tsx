@@ -1,10 +1,10 @@
-import { Asset } from "@/interfaces/asset";
+import { ImageAsset } from "@/interfaces/image-asset";
 import Image from "next/image";
 import { getImageById } from "@/lib/data/assets";
 
 export type ContentfulImageProps =
   | {
-      asset: Asset;
+      asset: ImageAsset;
       assetId?: never;
       className?: string;
       sizes?: string;

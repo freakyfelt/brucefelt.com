@@ -1,6 +1,6 @@
 import { PostStatus, RawPost } from "@/interfaces/post";
 import { Tag } from "@/interfaces/tag";
-import { Asset } from "@/interfaces/asset";
+import { ImageAsset } from "@/interfaces/image-asset";
 import { ContentfulGraphQLClient } from "../clients/contentful";
 
 const ALL_POST_SLUGS_QUERY = `
@@ -21,8 +21,8 @@ query FetchAllPostSlugs($limit: Int, $skip: Int = 0) {
 `;
 
 const ASSET_QUERY = `
-query FetchImageAssets($ids: [String]) {
-  assetCollection(where: {sys: {id_in: $ids}, contentType_contains: "image/"}) {
+query FetchImageAssets($ids: [String], $limit: Int, $skip: Int = 0) {
+  assetCollection(where: {sys: {id_in: $ids}, contentType_contains: "image/"}, limit: $limit, skip: $skip) {
     items {
       sys {
         id
@@ -42,8 +42,8 @@ query FetchImageAssets($ids: [String]) {
 type ContentfulPostMetadata = Pick<ContentfulPost, "slug" | "tagsCollection">;
 
 const POST_CONTENT_QUERY = `
-query FetchBlogPosts($slugs: [String]) {
-  blogPostCollection(where: {slug_in: $slugs}) {
+query FetchBlogPosts($slugs: [String], $limit: Int, $skip: Int = 0) {
+  blogPostCollection(where: {slug_in: $slugs}, limit: $limit, skip: $skip) {
     items {
       slug
       title
@@ -90,6 +90,28 @@ const decodeContentfulPost = (post: ContentfulPost): RawPost => ({
   status: (post.status as PostStatus) || "active",
 });
 
+type RawImageAsset = {
+  sys: { id: string };
+  title: string;
+  description: string;
+  contentType: string;
+  width: number;
+  height: number;
+  medium: string;
+  large: string;
+};
+
+const decodeContentfulImage = (asset: RawImageAsset): ImageAsset => ({
+  slug: asset.sys.id,
+  title: asset.title,
+  description: asset.description,
+  contentType: asset.contentType,
+  width: asset.width,
+  height: asset.height,
+  medium: asset.medium,
+  large: asset.large,
+});
+
 type PostMetadata = {
   slug: string;
   tags: Tag[];
@@ -115,30 +137,12 @@ export class ContentfulBlogStore {
     });
   }
 
-  async getAssets(ids: string[]): Promise<Asset[]> {
+  async getAssets(ids: string[]): Promise<ImageAsset[]> {
     if (ids.length === 0) return [];
 
-    const res = await this.client.fetch(ASSET_QUERY, { ids });
-    const assets = res.data.assetCollection.items as {
-      sys: { id: string };
-      title: string;
-      description: string;
-      contentType: string;
-      width: number;
-      height: number;
-      medium: string;
-      large: string;
-    }[];
-
-    return assets.map((asset) => ({
-      slug: asset.sys.id,
-      title: asset.title,
-      description: asset.description,
-      contentType: asset.contentType,
-      width: asset.width,
-      height: asset.height,
-      medium: asset.medium,
-      large: asset.large,
-    }));
+    return this.client.batchFetch(ASSET_QUERY, { ids }, 100, (data) => {
+      const assets = data!.assetCollection!.items as RawImageAsset[];
+      return assets.map(decodeContentfulImage);
+    });
   }
 }

@@ -1,4 +1,4 @@
-export type Asset = {
+export type ImageAsset = {
   slug: string; // Contentful Asset ID
   title: string;
   description: string;

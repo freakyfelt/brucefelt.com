@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ContentfulImage } from "./ContentfulImage";
-import { Asset } from "@/interfaces/asset";
+import { ImageAsset } from "@/interfaces/image-asset";
 
 // Mock next/image
 vi.mock("next/image", () => ({
@@ -22,7 +22,7 @@ vi.mock("@/lib/data/assets", () => ({
 }));
 
 describe("ContentfulImage", () => {
-  const mockAsset: Asset = {
+  const mockAsset: ImageAsset = {
     slug: "test-id",
     title: "Test Title",
     description: "Test Description",
