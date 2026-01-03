@@ -12,8 +12,8 @@ export default function AboutPage() {
     <PageContent>
       <Heading as="h1">About Me</Heading>
       <article>
-        <aside className="inline-block float-right mb-4 ml-4">
-          <Item className="pr-0 gap-0">
+        <aside className="inline-block md:float-right mb-4 md:ml-4">
+          <Item className="md:pr-0 md:gap-0">
             <ItemHeader>
               <figure>
                 <ContentfulImage
