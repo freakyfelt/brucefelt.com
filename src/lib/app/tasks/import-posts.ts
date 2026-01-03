@@ -1,5 +1,6 @@
 import { Tag } from "@/interfaces/tag";
 import { appContext } from "@/lib/app/context";
+import { staticImageAssets } from "@/lib/data/assets";
 
 type ImportResults = {
   posts: string[];
@@ -11,7 +12,7 @@ export async function importPosts(): Promise<ImportResults> {
   const slugs = metadata.map((m) => m.slug);
   const rawPosts = await appContext.stores.contentfulBlog.getBlogPosts(slugs);
 
-  const allAssetIds = new Set<string>();
+  const allAssetIds = new Set<string>(Object.values(staticImageAssets));
   const posts = rawPosts.map((post) => {
     const { transformedContent, assetIds } = transformPostContent(post.content);
     assetIds.forEach((id) => allAssetIds.add(id));

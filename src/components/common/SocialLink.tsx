@@ -1,6 +1,7 @@
 import React from "react";
 import { ExternalLink, type ExternalLinkProps } from "@/components/common/Link";
 import { Icon, type IconName } from "@/components/common/Icon";
+import { socials } from "@/lib/utils/url";
 
 export type SocialLinkTarget =
   | "github"
@@ -18,27 +19,27 @@ interface LinkConfig {
 const LINK_CONFIGS: Record<SocialLinkTarget, LinkConfig> = {
   bluesky: {
     icon: "bluesky",
-    url: "https://bsky.app/profile/freakyfelt.bsky.social",
+    url: socials.bluesky,
     label: "Bluesky (freakyfelt.bsky.social)",
   },
   github: {
     icon: "github",
-    url: "https://github.com/freakyfelt",
+    url: socials.github,
     label: "GitHub (freakyfelt)",
   },
   linkedin: {
     icon: "linkedin",
-    url: "https://linkedin.com/in/brucefelt",
+    url: socials.linkedin,
     label: "LinkedIn",
   },
   twitter: {
     icon: "twitter",
-    url: "https://x.com/freakyfelt",
+    url: socials.twitter,
     label: "Twitter (@freakyfelt)",
   },
   instagram: {
     icon: "instagram",
-    url: "https://instagram.com/freakyfelt",
+    url: socials.instagram,
     label: "Instagram (@freakyfelt)",
   },
 } as const;
