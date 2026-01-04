@@ -26,7 +26,7 @@ export function ImageItem({
 
   return (
     <Item
-      className="flex-col items-center gap-0 p-0 border-0 bg-transparent w-fit mx-auto"
+      className="flex-col gap-0 p-0 border-0 w-full md:w-fit mx-auto"
       style={
         {
           "--image-height": height ? `${height}px` : undefined,
