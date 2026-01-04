@@ -6,27 +6,15 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ReactNode } from "react";
-import { ContentfulImage } from "./ContentfulImage";
+import { ImageItem } from "./ImageItem";
 import { getImageById } from "@/lib/data/assets";
 
 export async function ImageCarouselItem({ assetId }: { assetId: string }) {
   const asset = await getImageById(assetId);
 
-  if (!asset) return null;
-
   return (
     <CarouselItem>
-      <figure className="flex flex-col h-full">
-        <div className="mx-auto w-fit max-w-full overflow-hidden rounded-lg border bg-muted">
-          <ContentfulImage asset={asset} height={500} />
-        </div>
-        {(asset.title || asset.description) && (
-          <figcaption className="mt-2 text-center text-sm text-muted-foreground">
-            {asset.title && <p className="font-medium">{asset.title}</p>}
-            {asset.description && <p>{asset.description}</p>}
-          </figcaption>
-        )}
-      </figure>
+      <ImageItem asset={asset} height={500} />
     </CarouselItem>
   );
 }
