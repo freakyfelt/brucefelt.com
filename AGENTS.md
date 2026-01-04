@@ -5,7 +5,7 @@
 This is a Next.js static site generation (SSG) project that generates a static website hosted via S3+CloudFront CDN.
 
 - All pages must be renderable via static site generation (SSG) and not be server side rendered (SSR) or client side rendered (CSR)
-- After any refactoring or file deletions, you MUST run the full test suite (`npm run test`) to ensure no broken imports or regressions.
+- After any refactoring or file deletions, you MUST run the full test suite (`npm run test` and `npm run test:e2e`) to ensure no broken imports or regressions.
 - When splitting or moving components, prefer keeping related components and their shared styles/variants in a single file if they are tightly coupled.
 - Blog posts are managed using Contentful. Content is imported locally as Markdown files in `data/blog/posts` before building.
 - MDX is used for rendering blog post content.
@@ -23,6 +23,7 @@ This is a Next.js static site generation (SSG) project that generates a static w
 - `src/lib/data` - Contains the data fetching functions (e.g., `blog.ts` for reading Markdown/JSON files)
 - `src/styles` - Contains the CSS files
 - `public` - Contains the static assets
+- `tests/e2e` - Contains the Playwright end-to-end tests
 
 ## Useful commands
 
@@ -34,6 +35,9 @@ This is a Next.js static site generation (SSG) project that generates a static w
 - `npm run lint` - Run the linter in error mode
 - `npm run format` - Run the linter in write mode
 - `npm run test` - Run the tests using Vitest
+- `npm run test:e2e` - Run all Playwright tests
+- `npm run test:e2e:ui` - Run tests with UI mode
+- `npm run test:e2e:debug` - Run tests in debug mode
 
 ## Dependencies
 
@@ -48,4 +52,6 @@ This project uses the following dependencies:
 - ESlint 9
 - Vitest 4
 - React Testing Library
+- Playwright
+- serve
 - MDX (`@next/mdx`, `@mdx-js/loader`, `@mdx-js/react`)

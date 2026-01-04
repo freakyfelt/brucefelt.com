@@ -13,7 +13,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 flex h-14 items-center justify-between">
-        <div className="flex items-center gap-6 md:gap-10">
+        <div className="flex items-center gap-2 sm:gap-6 md:gap-10">
           <Link
             path="/"
             variant="none"
@@ -21,7 +21,7 @@ export function Navbar() {
             aria-label="Home"
           >
             <span
-              className="inline-block font-bold text-xl sm:text-2xl"
+              className="inline-block font-bold text-lg sm:text-xl md:text-2xl"
               aria-hidden="true"
             >
               The Felt Facade
