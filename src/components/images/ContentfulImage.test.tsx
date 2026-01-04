@@ -11,12 +11,16 @@ vi.mock("next/image", () => ({
     className,
     width,
     height,
+    fill,
+    style,
   }: {
     src: string;
     alt: string;
     className: string;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
+    fill?: boolean;
+    style?: React.CSSProperties;
   }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -25,13 +29,10 @@ vi.mock("next/image", () => ({
       className={className}
       width={width}
       height={height}
+      data-fill={fill ? "true" : "false"}
+      data-style={style ? JSON.stringify(style) : undefined}
     />
   ),
-}));
-
-// Mock getImageById
-vi.mock("@/lib/data/assets", () => ({
-  getImageById: vi.fn(),
 }));
 
 describe("ContentfulImage", () => {
@@ -45,36 +46,51 @@ describe("ContentfulImage", () => {
     url: "//images.ctfassets.net/space/test-id/v1/image.webp",
   };
 
-  it("should render an image with the correct src and alt when asset is provided", async () => {
-    const Result = await ContentfulImage({ asset: mockAsset });
-    render(Result);
+  it("should render an image with the correct src and alt when asset is provided", () => {
+    render(<ContentfulImage asset={mockAsset} />);
 
     const img = screen.getByRole("img");
-    expect(img.getAttribute("src")).toBe(
-      "https://images.ctfassets.net/space/test-id/v1/image.webp?h=1000&q=75&fm=webp",
-    );
+    // The src prop passed to Image should have the default params
+    expect(img.getAttribute("src")).toContain("w=1000");
+    expect(img.getAttribute("src")).toContain("q=75");
+    expect(img.getAttribute("src")).toContain("fm=webp");
     expect(img.getAttribute("alt")).toBe("Test Title");
-    expect(img.getAttribute("width")).toBe("2000");
-    expect(img.getAttribute("height")).toBe("1000");
+    expect(img.getAttribute("width")).toBe("1000");
+    expect(img.getAttribute("height")).toBe("500");
   });
 
-  it("should use description as alt if title is missing", async () => {
+  it("should use description as alt if title is missing", () => {
     const assetWithoutTitle = { ...mockAsset, title: "" };
-    const Result = await ContentfulImage({ asset: assetWithoutTitle });
-    render(Result);
+    render(<ContentfulImage asset={assetWithoutTitle} />);
 
     const img = screen.getByRole("img");
     expect(img.getAttribute("alt")).toBe("Test Description");
   });
 
-  it("should apply custom className", async () => {
-    const Result = await ContentfulImage({
-      asset: mockAsset,
-      className: "custom-class",
-    });
-    render(Result);
+  it("should apply custom className", () => {
+    render(<ContentfulImage asset={mockAsset} className="custom-class" />);
 
     const img = screen.getByRole("img");
     expect(img.className).toContain("custom-class");
+  });
+
+  it("should support fill mode", () => {
+    render(<ContentfulImage asset={mockAsset} fill />);
+
+    const img = screen.getByRole("img");
+    expect(img.getAttribute("data-fill")).toBe("true");
+    expect(img.getAttribute("width")).toBeNull();
+    expect(img.getAttribute("height")).toBeNull();
+
+    const style = JSON.parse(img.getAttribute("data-style") || "{}");
+    expect(style.objectFit).toBe("contain");
+  });
+
+  it("should allow overriding width and height", () => {
+    render(<ContentfulImage asset={mockAsset} width={200} height={100} />);
+
+    const img = screen.getByRole("img");
+    expect(img.getAttribute("width")).toBe("200");
+    expect(img.getAttribute("height")).toBe("100");
   });
 });

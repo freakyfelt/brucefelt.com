@@ -6,7 +6,12 @@ const nextConfig: NextConfig = {
   output: "export",
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
   images: {
-    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.ctfassets.net",
+      },
+    ],
   },
 };
 
