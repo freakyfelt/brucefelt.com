@@ -60,10 +60,10 @@ test.describe("Desktop Navigation", () => {
     await page.goto("/");
 
     // Verify site title/logo is visible
-    // The logo is a link with aria-label="Home" in the header
-    const homeLink = page.locator("header").getByRole("link", { name: "Home" });
+    const homeLink = page
+      .locator("header")
+      .getByRole("link", { name: "The Felt Facade" });
     await expect(homeLink).toBeVisible();
-    await expect(homeLink).toContainText("The Felt Facade");
   });
 });
 
@@ -75,16 +75,22 @@ test.describe("Mobile Navigation", () => {
   test("should display navigation on mobile", async ({ page }) => {
     await page.goto("/");
 
-    // Since the navbar doesn't have a hamburger menu, verify links are still accessible
+    // Verify mobile navigation trigger is visible
     const nav = page.getByRole("navigation", { name: "Main Navigation" });
     await expect(nav).toBeVisible();
+
+    const trigger = nav.getByRole("button", { name: "Toggle menu" });
+    await expect(trigger).toBeVisible();
   });
 
   test("should be able to navigate on mobile", async ({ page }) => {
     await page.goto("/");
 
-    // Verify navigation links work on mobile
+    // Open mobile menu
     const nav = page.getByRole("navigation", { name: "Main Navigation" });
+    await nav.getByRole("button", { name: "Toggle menu" }).click();
+
+    // Verify navigation links work on mobile
     const blogLink = nav.getByRole("link", { name: "Blog" });
     await expect(blogLink).toBeVisible();
 
@@ -114,7 +120,10 @@ test.describe("Cross-Page Navigation", () => {
     await expect(page).toHaveURL(/.*\/blog\/posts/);
 
     // Go back to Home via logo/site title in header
-    await page.locator("header").getByRole("link", { name: "Home" }).click();
+    await page
+      .locator("header")
+      .getByRole("link", { name: "The Felt Facade" })
+      .click();
     await expect(page).toHaveURL("/");
   });
 
@@ -128,7 +137,8 @@ test.describe("Cross-Page Navigation", () => {
       const header = page.locator("header");
       await expect(header).toBeVisible();
 
-      // Verify nav links are present
+      // Verify nav links are present (Desktop)
+      await page.setViewportSize(SPECIFIC_VIEWPORTS.DESKTOP);
       const nav = page.getByRole("navigation", { name: "Main Navigation" });
       await expect(nav).toBeVisible();
 

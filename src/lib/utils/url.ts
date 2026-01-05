@@ -1,4 +1,5 @@
 export const paths = {
+  about: () => `/about`,
   blogPosts: () => `/blog/posts`,
   blogPost: (slug: string) => `/blog/posts/${slug}`,
   blogTag: (tag: string) => `/blog/tags/${tag}`,

@@ -13,7 +13,7 @@ export function Footer() {
           <Link path={paths.blogPosts()} variant="nav">
             Blog
           </Link>
-          <Link path="/about" variant="nav">
+          <Link path={paths.about()} variant="nav">
             About
           </Link>
         </nav>
