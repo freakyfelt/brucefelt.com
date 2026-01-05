@@ -8,8 +8,8 @@ interface HeadingProps {
 }
 
 const styles = {
-  h1: "text-4xl font-bold mb-4",
-  h2: "text-2xl font-bold mb-2",
+  h1: "text-2xl font-bold mb-2 md:text-4xl md:mb-4",
+  h2: "text-xl font-bold mb-1 md:text-2xl md:mb-2",
   h3: "text-lg font-semibold mb-2",
   h4: "text-base font-semibold mb-1",
   h5: "text-sm font-semibold",

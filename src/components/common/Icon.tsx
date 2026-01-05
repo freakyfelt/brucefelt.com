@@ -12,6 +12,7 @@ import {
   LuTriangleAlert,
   LuInfo,
   LuPackage,
+  LuMenu,
 } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ export const ICONS = {
   info: LuInfo,
   warning: LuTriangleAlert,
   package: LuPackage,
+  menu: LuMenu,
 } as const;
 
 export type IconName = keyof typeof ICONS;
