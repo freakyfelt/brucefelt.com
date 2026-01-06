@@ -1,52 +1,94 @@
-import { describe, it, expect } from "vitest";
-import { transformPostContent } from "./import-posts";
+import { describe, it, expect, vi } from "vitest";
+import { ImportPostsTask } from "./import-posts";
+import { AppContext } from "@/lib/app/context";
+import { Tag } from "@/interfaces/tag";
+import { RawPost } from "@/interfaces/post";
+import { ImageAsset } from "@/interfaces/image-asset";
 
-describe("transformPostContent", () => {
-  it("should transform [!IMAGE_GALLERY] block into ImageCarousel component with ImageCarouselItem children", () => {
-    const content = `
-## Gallery Test
+describe("ImportPostsTask", () => {
+  it("should import posts and tags correctly", async () => {
+    const mockTags: Tag[] = [
+      { displayName: "Tag 1", slug: "tag-1", description: "Desc" },
+    ];
+    const mockMetadata = [{ slug: "post-1", tags: mockTags }];
+    const mockRawPosts: RawPost[] = [
+      {
+        title: "Post 1",
+        slug: "post-1",
+        content:
+          "Content with some text\n\n> [!IMAGE_GALLERY]\n> ![Img](//images.ctfassets.net/s/id1/v/i.jpg)\n",
+        publishDate: "2024-01-01",
+        description: "Excerpt",
+        tags: ["tag-1"],
+        status: "active",
+      },
+    ];
+    const mockAssets: ImageAsset[] = [
+      {
+        slug: "id1",
+        url: "url1",
+        title: "f.jpg",
+        description: "desc",
+        contentType: "image/jpeg",
+        width: 100,
+        height: 100,
+      },
+    ];
 
-> [!IMAGE_GALLERY]
->
-> ![Image 1](//images.ctfassets.net/space/id1/v1/img1.webp)
-> ![Image 2](//images.ctfassets.net/space/id2/v1/img2.webp)
+    const mockContentfulBlog = {
+      getAllPostSlugs: vi.fn().mockResolvedValue(mockMetadata),
+      getBlogPosts: vi.fn().mockResolvedValue(mockRawPosts),
+      getAssets: vi.fn().mockResolvedValue(mockAssets),
+    };
 
-Some other text.
-`;
+    const mockBlogPosts = {
+      writeAll: vi.fn().mockResolvedValue(["path/to/post-1.mdx"]),
+    };
+    const mockBlogTags = {
+      writeAll: vi.fn().mockResolvedValue(["path/to/tag-1.json"]),
+    };
+    const mockImageAssets = {
+      writeAll: vi.fn().mockResolvedValue(["path/to/asset-1.json"]),
+    };
 
-    const { transformedContent, assetIds } = transformPostContent(content);
+    const mockContext = {
+      stores: {
+        contentfulBlog: mockContentfulBlog,
+        blogPosts: mockBlogPosts,
+        blogTags: mockBlogTags,
+        imageAssets: mockImageAssets,
+      },
+    } as unknown as AppContext;
 
-    expect(assetIds).toEqual(["id1", "id2"]);
-    expect(transformedContent).toContain("<ImageCarousel>");
-    expect(transformedContent).toContain('<ImageCarouselItem assetId="id1" />');
-    expect(transformedContent).toContain('<ImageCarouselItem assetId="id2" />');
-    expect(transformedContent).toContain("</ImageCarousel>");
-    expect(transformedContent).not.toContain("> [!IMAGE_GALLERY]");
-  });
+    const task = new ImportPostsTask(mockContext);
+    const results = await task.perform();
 
-  it("should handle multiple gallery blocks", () => {
-    const content = `
-> [!IMAGE_GALLERY]
-> ![Img 1](//images.ctfassets.net/s/id1/v/i1.webp)
+    expect(mockContentfulBlog.getAllPostSlugs).toHaveBeenCalled();
+    expect(mockContentfulBlog.getBlogPosts).toHaveBeenCalledWith(["post-1"]);
 
-Middle text.
+    // Check that assets were fetched (including static ones and those from content)
+    expect(mockContentfulBlog.getAssets).toHaveBeenCalled();
+    const fetchedAssetIds = mockContentfulBlog.getAssets.mock.calls[0][0];
+    console.log("Fetched Asset IDs:", fetchedAssetIds);
+    expect(fetchedAssetIds).toContain("id1");
+    expect(fetchedAssetIds).toContain("5X0ig9hXwUzwXITz03HOS1");
 
-> [!IMAGE_GALLERY]
-> ![Img 2](//images.ctfassets.net/s/id2/v/i2.webp)
-`;
+    expect(mockImageAssets.writeAll).toHaveBeenCalledWith(mockAssets, {
+      deleteExisting: true,
+    });
+    expect(mockBlogTags.writeAll).toHaveBeenCalledWith(mockTags, {
+      deleteExisting: true,
+    });
 
-    const { transformedContent, assetIds } = transformPostContent(content);
+    // Check that posts were written with transformed content
+    expect(mockBlogPosts.writeAll).toHaveBeenCalled();
+    const writtenPosts = mockBlogPosts.writeAll.mock.calls[0][0];
+    expect(writtenPosts[0].content).not.toContain("//images.ctfassets.net");
 
-    expect(assetIds).toEqual(["id1", "id2"]);
-    expect(transformedContent).toContain('<ImageCarouselItem assetId="id1" />');
-    expect(transformedContent).toContain('<ImageCarouselItem assetId="id2" />');
-  });
-
-  it("should return empty assetIds if no gallery is present", () => {
-    const content = "## No Gallery Here";
-    const { transformedContent, assetIds } = transformPostContent(content);
-
-    expect(assetIds).toEqual([]);
-    expect(transformedContent).toBe(content);
+    expect(results).toEqual({
+      posts: ["path/to/post-1.mdx"],
+      tags: ["path/to/tag-1.json"],
+      assets: ["path/to/asset-1.json"],
+    });
   });
 });

@@ -3,7 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Icon, IconName } from "@/components/common/Icon";
 import { cn } from "@/lib/utils";
 
-type CalloutVariant = "info" | "warning";
+type CalloutVariant = "info" | "warning" | "error" | "success";
 
 interface CalloutProps {
   title?: string;
@@ -19,9 +19,17 @@ type CalloutVariantConfig = {
 };
 
 const VARIANT_CONFIG: Record<CalloutVariant, CalloutVariantConfig> = {
+  error: {
+    className: "border-red-500/50 [&>svg]:text-red-500",
+    iconName: "error",
+  },
   info: {
     className: "border-blue-500/50 [&>svg]:text-blue-500",
     iconName: "info",
+  },
+  success: {
+    className: "border-green-500/50 [&>svg]:text-green-500",
+    iconName: "success",
   },
   warning: {
     className: "border-yellow-500/50 [&>svg]:text-yellow-500",
