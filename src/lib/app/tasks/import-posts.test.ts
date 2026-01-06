@@ -2,12 +2,9 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import path from "path";
 import { ImportPostsTask } from "./import-posts";
 import { createTestContext, TestContext } from "@test/context";
-import {
-  mockTags,
-  mockContentfulPostMetadata,
-  mockContentfulPost,
-  mockContentfulAssets,
-} from "@test/fixtures/contentful";
+import { mockContentfulPost, post1 } from "@test/fixtures/posts";
+import { tag1 } from "@test/fixtures/tags";
+import { asset1, asset2 } from "@test/fixtures/assets";
 
 describe("ImportPostsTask", () => {
   let context: TestContext;
@@ -30,7 +27,14 @@ describe("ImportPostsTask", () => {
       response: {
         data: {
           blogPostCollection: {
-            items: [mockContentfulPostMetadata],
+            items: [
+              {
+                slug: post1.slug,
+                tagsCollection: {
+                  items: [tag1],
+                },
+              },
+            ],
           },
         },
       },
@@ -51,14 +55,14 @@ describe("ImportPostsTask", () => {
     context.mocks.graphql.expectQuery({
       operationName: "FetchImageAssets",
       variables: {
-        ids: ["5X0ig9hXwUzwXITz03HOS1", "id1"],
+        ids: [asset2.sys.id, asset1.sys.id],
         limit: 100,
         skip: 0,
       },
       response: {
         data: {
           assetCollection: {
-            items: mockContentfulAssets,
+            items: [asset1, asset2],
           },
         },
       },
@@ -80,7 +84,7 @@ describe("ImportPostsTask", () => {
         deleteExisting: true,
       },
     );
-    expect(blogTagsSpy).toHaveBeenCalledWith(mockTags, {
+    expect(blogTagsSpy).toHaveBeenCalledWith([tag1], {
       deleteExisting: true,
     });
 

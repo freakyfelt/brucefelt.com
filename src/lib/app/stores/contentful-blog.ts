@@ -38,7 +38,10 @@ query FetchImageAssets($ids: [String], $limit: Int, $skip: Int = 0) {
 }
 `;
 
-type ContentfulPostMetadata = Pick<ContentfulPost, "slug" | "tagsCollection">;
+export type ContentfulPostMetadata = Pick<
+  ContentfulPost,
+  "slug" | "tagsCollection"
+>;
 
 const POST_CONTENT_QUERY = `
 query FetchBlogPosts($slugs: [String], $limit: Int, $skip: Int = 0) {
@@ -89,7 +92,7 @@ const decodeContentfulPost = (post: ContentfulPost): RawPost => ({
   status: (post.status as PostStatus) || "active",
 });
 
-type RawImageAsset = {
+export type RawImageAsset = {
   sys: { id: string };
   title: string;
   description: string;
