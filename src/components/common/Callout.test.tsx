@@ -6,14 +6,14 @@ describe("AlertBanner", () => {
   it("renders info variant by default", () => {
     render(<Callout>Info message</Callout>);
     const alert = screen.getByRole("alert");
-    expect(alert).toHaveClass("border-blue-500/50");
+    expect(alert).toHaveClass("border-blue-500");
     expect(screen.getByText("Info message")).toBeInTheDocument();
   });
 
   it("renders warning variant", () => {
     render(<Callout variant="warning">Warning message</Callout>);
     const alert = screen.getByRole("alert");
-    expect(alert).toHaveClass("border-yellow-500/50");
+    expect(alert).toHaveClass("border-yellow-500");
     expect(screen.getByText("Warning message")).toBeInTheDocument();
   });
 
