@@ -14,6 +14,7 @@ import {
   LuPackage,
   LuMenu,
   LuCheck,
+  LuCircleX,
 } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ export const ICONS = {
   instagram: SiInstagram,
   sun: LuSun,
   moon: LuMoon,
+  error: LuCircleX,
   info: LuInfo,
   warning: LuTriangleAlert,
   package: LuPackage,
