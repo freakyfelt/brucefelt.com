@@ -1,17 +1,7 @@
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeAll,
-  afterAll,
-  afterEach,
-} from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import path from "path";
 import { ImportPostsTask } from "./import-posts";
-import { AppContext } from "@/lib/app/context";
-import { MockGraphQLServer } from "@test/utils/mock-server";
-import { ContentfulBlogStore } from "@/lib/app/stores/contentful-blog";
-import { ContentfulGraphQLClient } from "@/lib/app/clients/contentful";
+import { createTestContext, TestContext } from "@test/context";
 import {
   mockTags,
   mockContentfulPostMetadata,
@@ -19,19 +9,22 @@ import {
   mockContentfulAssets,
 } from "@test/fixtures/contentful";
 
-const mockServer = new MockGraphQLServer();
-
 describe("ImportPostsTask", () => {
-  beforeAll(() => mockServer.start());
-  afterAll(() => mockServer.stop());
+  let context: TestContext;
+
+  beforeEach(() => {
+    context = createTestContext();
+    context.mocks.graphql.start();
+  });
+
   afterEach(() => {
-    mockServer.verify();
-    mockServer.reset();
+    context.mocks.graphql.verify();
+    context.teardown();
   });
 
   it("should import posts and tags correctly", async () => {
     // Register expected queries
-    mockServer.expectQuery({
+    context.mocks.graphql.expectQuery({
       operationName: "FetchAllPostSlugs",
       variables: { limit: 100, skip: 0 },
       response: {
@@ -43,7 +36,7 @@ describe("ImportPostsTask", () => {
       },
     });
 
-    mockServer.expectQuery({
+    context.mocks.graphql.expectQuery({
       operationName: "FetchBlogPosts",
       variables: { slugs: ["post-1"], limit: 10, skip: 0 },
       response: {
@@ -55,7 +48,7 @@ describe("ImportPostsTask", () => {
       },
     });
 
-    mockServer.expectQuery({
+    context.mocks.graphql.expectQuery({
       operationName: "FetchImageAssets",
       variables: {
         ids: ["5X0ig9hXwUzwXITz03HOS1", "id1"],
@@ -71,35 +64,14 @@ describe("ImportPostsTask", () => {
       },
     });
 
-    const mockBlogPosts = {
-      writeAll: vi.fn().mockResolvedValue(["path/to/post-1.mdx"]),
-    };
-    const mockBlogTags = {
-      writeAll: vi.fn().mockResolvedValue(["path/to/tag-1.json"]),
-    };
-    const mockImageAssets = {
-      writeAll: vi.fn().mockResolvedValue(["path/to/asset-1.json"]),
-    };
+    const blogPostsSpy = vi.spyOn(context.stores.blogPosts, "writeAll");
+    const blogTagsSpy = vi.spyOn(context.stores.blogTags, "writeAll");
+    const imageAssetsSpy = vi.spyOn(context.stores.imageAssets, "writeAll");
 
-    const contentfulClient = new ContentfulGraphQLClient({
-      spaceId: "test-space",
-      accessToken: "test-token",
-    });
-    const contentfulBlog = new ContentfulBlogStore(contentfulClient);
-
-    const mockContext = {
-      stores: {
-        contentfulBlog,
-        blogPosts: mockBlogPosts,
-        blogTags: mockBlogTags,
-        imageAssets: mockImageAssets,
-      },
-    } as unknown as AppContext;
-
-    const task = new ImportPostsTask(mockContext);
+    const task = new ImportPostsTask(context);
     const results = await task.perform();
 
-    expect(mockImageAssets.writeAll).toHaveBeenCalledWith(
+    expect(imageAssetsSpy).toHaveBeenCalledWith(
       expect.arrayContaining([
         expect.objectContaining({ slug: "id1" }),
         expect.objectContaining({ slug: "5X0ig9hXwUzwXITz03HOS1" }),
@@ -108,19 +80,23 @@ describe("ImportPostsTask", () => {
         deleteExisting: true,
       },
     );
-    expect(mockBlogTags.writeAll).toHaveBeenCalledWith(mockTags, {
+    expect(blogTagsSpy).toHaveBeenCalledWith(mockTags, {
       deleteExisting: true,
     });
 
     // Check that posts were written with transformed content
-    expect(mockBlogPosts.writeAll).toHaveBeenCalled();
-    const writtenPosts = mockBlogPosts.writeAll.mock.calls[0][0];
+    expect(blogPostsSpy).toHaveBeenCalled();
+    const writtenPosts = blogPostsSpy.mock.calls[0][0];
     expect(writtenPosts[0].content).not.toContain("//images.ctfassets.net");
 
+    const rootDir = context.config.storage.rootDir;
     expect(results).toEqual({
-      posts: ["path/to/post-1.mdx"],
-      tags: ["path/to/tag-1.json"],
-      assets: ["path/to/asset-1.json"],
+      posts: [path.join(rootDir, "blog/posts/post-1.mdx")],
+      tags: [path.join(rootDir, "blog/tags/tag-1.json")],
+      assets: [
+        path.join(rootDir, "assets/images/id1.json"),
+        path.join(rootDir, "assets/images/5X0ig9hXwUzwXITz03HOS1.json"),
+      ],
     });
   });
 });
