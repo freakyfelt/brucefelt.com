@@ -21,9 +21,22 @@ This is a Next.js static site generation (SSG) project that generates a static w
 - `data/blog/posts` - Contains the blog post Markdown files (imported from Contentful)
 - `data/blog/tags` - Contains the blog tag JSON files (imported from Contentful)
 - `src/lib/data` - Contains the data fetching functions (e.g., `blog.ts` for reading Markdown/JSON files)
+- `src/lib/app` - Contains the application logic, including:
+  - `clients` - API and filesystem clients
+  - `stores` - Data stores (e.g., Contentful, local filesystem)
+  - `tasks` - Background or build-time tasks (e.g., importing posts)
+  - `utils` - Application-specific utilities
 - `src/styles` - Contains the CSS files
 - `public` - Contains the static assets
 - `tests/e2e` - Contains the Playwright end-to-end tests
+- `tests/utils` - Contains test utilities like `MockGraphQLServer`
+- `tests/context.ts` - Provides `createTestContext` for integration tests with isolated filesystem and mock server
+
+## Testing Patterns
+
+- **Integration Tests**: Use `createTestContext()` in `beforeEach` to set up an isolated environment with a temporary directory and a mock GraphQL server. Always call `context.teardown()` in `afterEach`.
+- **GraphQL Mocking**: Use `context.mocks.graphql.expectQuery()` to register expected GraphQL operations and their responses.
+- **Filesystem Storage**: Tests should use real `FilesystemStorage` instances pointing to the temporary directory provided by the test context to ensure realistic behavior.
 
 ## Useful commands
 
@@ -55,3 +68,4 @@ This project uses the following dependencies:
 - Playwright
 - serve
 - MDX (`@next/mdx`, `@mdx-js/loader`, `@mdx-js/react`)
+- MSW (Mock Service Worker) for API mocking

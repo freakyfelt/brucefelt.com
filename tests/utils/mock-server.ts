@@ -1,5 +1,6 @@
 import { setupServer } from "msw/node";
 import { graphql, HttpResponse } from "msw";
+import { isDeepStrictEqual } from "node:util";
 
 export type MockQuery = {
   operationName: string;
@@ -21,7 +22,7 @@ export class MockGraphQLServer {
           const nameMatches = expected.operationName === operationName;
           const variablesMatch =
             !expected.variables ||
-            this.isDeepEqual(expected.variables, variables);
+            isDeepStrictEqual(expected.variables, variables);
 
           return nameMatches && variablesMatch;
         });

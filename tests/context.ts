@@ -31,9 +31,18 @@ export function createTestContext(): TestContext {
       graphql: mockServer,
     },
     teardown() {
-      mockServer.stop();
-      if (fs.existsSync(tmpDir)) {
-        fs.rmSync(tmpDir, { recursive: true, force: true });
+      try {
+        mockServer.stop();
+      } catch (e) {
+        console.error("Failed to stop mock server", e);
+      }
+
+      try {
+        if (fs.existsSync(tmpDir)) {
+          fs.rmSync(tmpDir, { recursive: true, force: true });
+        }
+      } catch (e) {
+        console.error("Failed to remove temporary directory", e);
       }
     },
   };
