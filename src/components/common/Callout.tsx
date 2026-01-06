@@ -20,19 +20,23 @@ type CalloutVariantConfig = {
 
 const VARIANT_CONFIG: Record<CalloutVariant, CalloutVariantConfig> = {
   error: {
-    className: "border-red-500/50 [&>svg]:text-red-500",
+    className:
+      "border-red-500 bg-red-50 dark:bg-red-500/5 [&>svg]:text-red-500",
     iconName: "error",
   },
   info: {
-    className: "border-blue-500/50 [&>svg]:text-blue-500",
+    className:
+      "border-blue-500 bg-blue-50 dark:bg-blue-500/5 [&>svg]:text-blue-500",
     iconName: "info",
   },
   success: {
-    className: "border-green-500/50 [&>svg]:text-green-500",
+    className:
+      "border-green-500 bg-green-50 dark:bg-green-500/5 [&>svg]:text-green-500",
     iconName: "success",
   },
   warning: {
-    className: "border-yellow-500/50 [&>svg]:text-yellow-500",
+    className:
+      "border-yellow-500 bg-yellow-50 dark:bg-yellow-500/5 [&>svg]:text-yellow-500",
     iconName: "warning",
   },
 };
