@@ -3,7 +3,7 @@ import { Tag } from "@/interfaces/tag";
 import { ImageAsset } from "@/interfaces/image-asset";
 import { ContentfulGraphQLClient } from "../clients/contentful";
 
-const ALL_POST_SLUGS_QUERY = `
+export const ALL_POST_SLUGS_QUERY = `
 query FetchAllPostSlugs($limit: Int, $skip: Int = 0) {
   blogPostCollection(limit: $limit, skip: $skip, order: publishDate_DESC) {
     items {
@@ -20,7 +20,7 @@ query FetchAllPostSlugs($limit: Int, $skip: Int = 0) {
 }
 `;
 
-const ASSET_QUERY = `
+export const ASSET_QUERY = `
 query FetchImageAssets($ids: [String], $limit: Int, $skip: Int = 0) {
   assetCollection(where: {sys: {id_in: $ids}, contentType_contains: "image/"}, limit: $limit, skip: $skip) {
     items {
@@ -40,7 +40,7 @@ query FetchImageAssets($ids: [String], $limit: Int, $skip: Int = 0) {
 
 type ContentfulPostMetadata = Pick<ContentfulPost, "slug" | "tagsCollection">;
 
-const POST_CONTENT_QUERY = `
+export const POST_CONTENT_QUERY = `
 query FetchBlogPosts($slugs: [String], $limit: Int, $skip: Int = 0) {
   blogPostCollection(where: {slug_in: $slugs}, limit: $limit, skip: $skip) {
     items {

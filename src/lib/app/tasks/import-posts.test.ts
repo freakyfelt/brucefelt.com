@@ -1,45 +1,75 @@
-import { describe, it, expect, vi } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeAll,
+  afterAll,
+  afterEach,
+} from "vitest";
 import { ImportPostsTask } from "./import-posts";
 import { AppContext } from "@/lib/app/context";
-import { Tag } from "@/interfaces/tag";
-import { RawPost } from "@/interfaces/post";
-import { ImageAsset } from "@/interfaces/image-asset";
+import { MockGraphQLServer } from "@test/utils/mock-server";
+import { ContentfulBlogStore } from "@/lib/app/stores/contentful-blog";
+import { ContentfulGraphQLClient } from "@/lib/app/clients/contentful";
+import {
+  mockTags,
+  mockContentfulPostMetadata,
+  mockContentfulPost,
+  mockContentfulAssets,
+} from "@test/fixtures/contentful";
+
+const mockServer = new MockGraphQLServer();
 
 describe("ImportPostsTask", () => {
-  it("should import posts and tags correctly", async () => {
-    const mockTags: Tag[] = [
-      { displayName: "Tag 1", slug: "tag-1", description: "Desc" },
-    ];
-    const mockMetadata = [{ slug: "post-1", tags: mockTags }];
-    const mockRawPosts: RawPost[] = [
-      {
-        title: "Post 1",
-        slug: "post-1",
-        content:
-          "Content with some text\n\n> [!IMAGE_GALLERY]\n> ![Img](//images.ctfassets.net/s/id1/v/i.jpg)\n",
-        publishDate: "2024-01-01",
-        description: "Excerpt",
-        tags: ["tag-1"],
-        status: "active",
-      },
-    ];
-    const mockAssets: ImageAsset[] = [
-      {
-        slug: "id1",
-        url: "url1",
-        title: "f.jpg",
-        description: "desc",
-        contentType: "image/jpeg",
-        width: 100,
-        height: 100,
-      },
-    ];
+  beforeAll(() => mockServer.start());
+  afterAll(() => mockServer.stop());
+  afterEach(() => {
+    mockServer.verify();
+    mockServer.reset();
+  });
 
-    const mockContentfulBlog = {
-      getAllPostSlugs: vi.fn().mockResolvedValue(mockMetadata),
-      getBlogPosts: vi.fn().mockResolvedValue(mockRawPosts),
-      getAssets: vi.fn().mockResolvedValue(mockAssets),
-    };
+  it("should import posts and tags correctly", async () => {
+    // Register expected queries
+    mockServer.expectQuery({
+      operationName: "FetchAllPostSlugs",
+      variables: { limit: 100, skip: 0 },
+      response: {
+        data: {
+          blogPostCollection: {
+            items: [mockContentfulPostMetadata],
+          },
+        },
+      },
+    });
+
+    mockServer.expectQuery({
+      operationName: "FetchBlogPosts",
+      variables: { slugs: ["post-1"], limit: 10, skip: 0 },
+      response: {
+        data: {
+          blogPostCollection: {
+            items: [mockContentfulPost],
+          },
+        },
+      },
+    });
+
+    mockServer.expectQuery({
+      operationName: "FetchImageAssets",
+      variables: {
+        ids: ["5X0ig9hXwUzwXITz03HOS1", "id1"],
+        limit: 100,
+        skip: 0,
+      },
+      response: {
+        data: {
+          assetCollection: {
+            items: mockContentfulAssets,
+          },
+        },
+      },
+    });
 
     const mockBlogPosts = {
       writeAll: vi.fn().mockResolvedValue(["path/to/post-1.mdx"]),
@@ -51,9 +81,15 @@ describe("ImportPostsTask", () => {
       writeAll: vi.fn().mockResolvedValue(["path/to/asset-1.json"]),
     };
 
+    const contentfulClient = new ContentfulGraphQLClient({
+      spaceId: "test-space",
+      accessToken: "test-token",
+    });
+    const contentfulBlog = new ContentfulBlogStore(contentfulClient);
+
     const mockContext = {
       stores: {
-        contentfulBlog: mockContentfulBlog,
+        contentfulBlog,
         blogPosts: mockBlogPosts,
         blogTags: mockBlogTags,
         imageAssets: mockImageAssets,
@@ -63,19 +99,15 @@ describe("ImportPostsTask", () => {
     const task = new ImportPostsTask(mockContext);
     const results = await task.perform();
 
-    expect(mockContentfulBlog.getAllPostSlugs).toHaveBeenCalled();
-    expect(mockContentfulBlog.getBlogPosts).toHaveBeenCalledWith(["post-1"]);
-
-    // Check that assets were fetched (including static ones and those from content)
-    expect(mockContentfulBlog.getAssets).toHaveBeenCalled();
-    const fetchedAssetIds = mockContentfulBlog.getAssets.mock.calls[0][0];
-    console.log("Fetched Asset IDs:", fetchedAssetIds);
-    expect(fetchedAssetIds).toContain("id1");
-    expect(fetchedAssetIds).toContain("5X0ig9hXwUzwXITz03HOS1");
-
-    expect(mockImageAssets.writeAll).toHaveBeenCalledWith(mockAssets, {
-      deleteExisting: true,
-    });
+    expect(mockImageAssets.writeAll).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ slug: "id1" }),
+        expect.objectContaining({ slug: "5X0ig9hXwUzwXITz03HOS1" }),
+      ]),
+      {
+        deleteExisting: true,
+      },
+    );
     expect(mockBlogTags.writeAll).toHaveBeenCalledWith(mockTags, {
       deleteExisting: true,
     });
