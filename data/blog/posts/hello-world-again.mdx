@@ -9,9 +9,10 @@ tags:
   - berlin
 status: archived
 ---
+
 > [!WARNING]
 > Stale content (2020)
-> 
+>
 > This post is from 2020 and its content is no longer accurate
 
 Hello again! If you saw the site prior to April 2020 you probably noticed that things look a bit...bland. I just migrated from Wordpress's hosted blog system to a new solution that may motivate me to actually keep the thing up to date (see below for more details).
@@ -27,4 +28,3 @@ As for Berlin itself? I've visited here multiple times since my first time abroa
 # Alright tell me about the nerdy stuff
 
 This incarnation of the website uses [Gatsby.js](https://gatsbyjs.org/) to generate a static React website every time a build is triggered. Static in this case means that there's no database, no PHP/NodeJS/Ruby, no real backend to speak of, on the public website. That results in a very speedy site with a smaller attack surface. Hosting itself is done using [Netlify](https://netlify.org/), which listens to changes on the code hosted in [GitHub](https://github.com/freakyfelt/brucefelt-com) along with blog content that is hosted in my Contentful space and then rebuilds and deploys the website. It's pretty slick.
-

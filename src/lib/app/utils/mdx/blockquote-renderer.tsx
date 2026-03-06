@@ -11,20 +11,18 @@ import { extractContentfulAssetIdFromSrc } from "@/lib/app/utils/mdx/asset-scann
 type CalloutVariant = "info" | "success" | "warning" | "error";
 
 /**
- * A handler receives the tag name and the text lines of the blockquote
- * (line 0 is `[!TAG]`, line 1 is the optional title, remaining lines are body)
- * along with the original React children, and returns a React element.
+ * A handler receives the tag name and the sibling React children that follow
+ * the `[!TAG]` element, and returns a React element.
  */
 export type BlockquoteTagHandler = (
   tag: string,
-  lines: string[],
-  children: React.ReactNode,
+  children: React.ReactNode[],
 ) => React.ReactElement;
 
 // ─── React children helpers ───────────────────────────────────────────────────
 
 /** Recursively extracts plain text content from a React node tree. */
-export function extractText(node: React.ReactNode): string {
+function extractText(node: React.ReactNode): string {
   if (typeof node === "string") return node;
   if (typeof node === "number") return String(node);
   if (!node) return "";
@@ -36,7 +34,7 @@ export function extractText(node: React.ReactNode): string {
 }
 
 /** Recursively collects `src` attributes from all <img> nodes in a React tree. */
-export function extractImageSrcs(node: React.ReactNode): string[] {
+function extractImageSrcs(node: React.ReactNode): string[] {
   if (!node) return [];
   if (Array.isArray(node)) return node.flatMap(extractImageSrcs);
   if (React.isValidElement(node)) {
@@ -50,10 +48,24 @@ export function extractImageSrcs(node: React.ReactNode): string[] {
   return [];
 }
 
+/** Normalises React children to a flat array, filtering whitespace-only strings. */
+function toChildArray(node: React.ReactNode): React.ReactNode[] {
+  if (!node) return [];
+  if (Array.isArray(node))
+    return node.filter(
+      (c) =>
+        c !== null &&
+        c !== undefined &&
+        c !== false &&
+        !(typeof c === "string" && c.trim() === ""),
+    );
+  return [node];
+}
+
 // ─── Built-in handlers ────────────────────────────────────────────────────────
 
-const imageGalleryHandler: BlockquoteTagHandler = (_tag, _lines, children) => {
-  const srcs = extractImageSrcs(children);
+const imageGalleryHandler: BlockquoteTagHandler = (_tag, siblings) => {
+  const srcs = extractImageSrcs(siblings);
   const assetIds = srcs
     .map(extractContentfulAssetIdFromSrc)
     .filter((id): id is string => id !== null);
@@ -74,12 +86,26 @@ const CALLOUT_VARIANTS: Record<string, CalloutVariant> = {
   ERROR: "error",
 };
 
-const calloutHandler: BlockquoteTagHandler = (tag, lines, children) => {
+/**
+ * Renders a callout from the sibling nodes that follow the `[!TAG]` element.
+ *
+ * - **Single sibling**: no title; the sibling becomes the body.
+ * - **Multiple siblings**: the first sibling becomes the title; the rest
+ *   become the body.
+ */
+const calloutHandler: BlockquoteTagHandler = (tag, siblings) => {
   const variant = CALLOUT_VARIANTS[tag] ?? "info";
-  const title = lines[1]?.trim();
+
+  if (siblings.length <= 1) {
+    return <Callout variant={variant}>{siblings[0] ?? null}</Callout>;
+  }
+
+  const [titleNode, ...bodyNodes] = siblings;
+  const body = bodyNodes.length === 1 ? bodyNodes[0] : bodyNodes;
+
   return (
-    <Callout variant={variant} title={title || undefined}>
-      {children}
+    <Callout variant={variant} title={titleNode}>
+      {body}
     </Callout>
   );
 };
@@ -100,9 +126,16 @@ export const BLOCKQUOTE_HANDLERS: Record<string, BlockquoteTagHandler> = {
 
 // ─── Main renderer ────────────────────────────────────────────────────────────
 
+const TAG_LINE_RE = /^\[!([A-Z_]+)\](?:\n([\s\S]*))?$/;
+
 /**
  * Attempts to render a tagged blockquote (`> [!TAG]`) as a JSX component
  * by looking up the tag in `BLOCKQUOTE_HANDLERS`.
+ *
+ * Normalises children to an array, checks whether the first element starts
+ * with a `[!TAG]` marker, then passes the remaining siblings to the handler.
+ * If the first element contains additional text after the tag line (e.g. a
+ * title on the next line), that text is prepended to the siblings array.
  *
  * Returns `null` if the blockquote does not start with a recognised `[!TAG]`,
  * allowing the caller to fall back to default blockquote rendering.
@@ -110,14 +143,23 @@ export const BLOCKQUOTE_HANDLERS: Record<string, BlockquoteTagHandler> = {
 export function renderTaggedBlockquote(
   children: React.ReactNode,
 ): React.ReactElement | null {
-  const text = extractText(children).trim();
-  const lines = text.split(/\n/);
-  const tagMatch = lines[0]?.match(/^\[!([A-Z_]+)\]$/);
+  const nodes = toChildArray(children);
+  if (nodes.length === 0) return null;
+
+  const [first, ...rest] = nodes;
+  const firstText = extractText(first).trim();
+  const tagMatch = firstText.match(TAG_LINE_RE);
   if (!tagMatch) return null;
 
   const tag = tagMatch[1];
   const handler = BLOCKQUOTE_HANDLERS[tag];
   if (!handler) return null;
 
-  return handler(tag, lines, children);
+  // If the first element contained extra text after the tag line (e.g. a title
+  // on the next `>` line without a blank separator), pass that text as the
+  // first sibling so handlers treat it as the title paragraph.
+  const afterTag = tagMatch[2]?.trim();
+  const siblings: React.ReactNode[] = afterTag ? [afterTag, ...rest] : rest;
+
+  return handler(tag, siblings);
 }

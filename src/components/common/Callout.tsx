@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 type CalloutVariant = "info" | "warning" | "error" | "success";
 
 interface CalloutProps {
-  title?: string;
+  title?: React.ReactNode;
   children: React.ReactNode;
   variant?: CalloutVariant;
   icon?: IconName;

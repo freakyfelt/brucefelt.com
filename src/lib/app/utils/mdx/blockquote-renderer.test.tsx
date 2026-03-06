@@ -1,13 +1,11 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render } from "@testing-library/react";
+import * as runtime from "react/jsx-runtime";
+import { evaluateSync } from "@mdx-js/mdx";
+import { render, screen } from "@testing-library/react";
 import {
-  extractText,
-  extractImageSrcs,
   renderTaggedBlockquote,
 } from "./blockquote-renderer";
-
-// ─── Mock heavy components ────────────────────────────────────────────────────
 
 vi.mock("@/components/common/Callout", () => ({
   Callout: ({
@@ -16,11 +14,12 @@ vi.mock("@/components/common/Callout", () => ({
     children,
   }: {
     variant: string;
-    title?: string;
+    title?: React.ReactNode;
     children?: React.ReactNode;
   }) => (
-    <div data-testid="callout" data-variant={variant} data-title={title}>
-      {children}
+    <div data-testid="callout" data-variant={variant}>
+      {title && <div data-testid="callout-title">{title}</div>}
+      <div data-testid="callout-body">{children}</div>
     </div>
   ),
 }));
@@ -34,129 +33,147 @@ vi.mock("@/components/images/ImageCarousel", () => ({
   ),
 }));
 
-// ─── extractText ──────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-describe("extractText", () => {
-  it("returns string nodes as-is", () => {
-    expect(extractText("hello")).toBe("hello");
+/**
+ * Evaluates MDX content and renders it with a custom blockquote component
+ * that calls `renderTaggedBlockquote`. Returns the rendered container.
+ */
+function renderMdx(content: string) {
+  const trimmed = content
+    .split("\n")
+    .map((line) => line.trim())
+    .join("\n");
+
+  const { default: MDXContent } = evaluateSync(trimmed, {
+    ...runtime,
+    development: false,
   });
 
-  it("converts number nodes to string", () => {
-    expect(extractText(42)).toBe("42");
-  });
+  const { container } = render(
+    <MDXContent
+      components={{
+        blockquote: ({ children }: { children?: React.ReactNode }) => {
+          const result = renderTaggedBlockquote(children);
+          if (result) return result;
+          return <blockquote>{children}</blockquote>;
+        },
+      }}
+    />,
+  );
 
-  it("returns empty string for null/undefined", () => {
-    expect(extractText(null)).toBe("");
-    expect(extractText(undefined)).toBe("");
-  });
+  return container;
+}
 
-  it("joins array nodes", () => {
-    expect(extractText(["hello", " ", "world"])).toBe("hello world");
-  });
-
-  it("extracts text from React elements recursively", () => {
-    const node = (
-      <p>
-        Hello <strong>world</strong>
-      </p>
-    );
-    expect(extractText(node)).toBe("Hello world");
-  });
-});
-
-// ─── extractImageSrcs ─────────────────────────────────────────────────────────
-
-describe("extractImageSrcs", () => {
-  it("returns empty array for null", () => {
-    expect(extractImageSrcs(null)).toEqual([]);
-  });
-
-  it("extracts src from a single img element", () => {
-    const node = <img src="https://example.com/img.png" alt="test" />;
-    expect(extractImageSrcs(node)).toEqual(["https://example.com/img.png"]);
-  });
-
-  it("extracts srcs from nested elements", () => {
-    const node = (
-      <div>
-        <img src="//images.ctfassets.net/s/id1/v/img1.webp" alt="1" />
-        <img src="//images.ctfassets.net/s/id2/v/img2.webp" alt="2" />
-      </div>
-    );
-    expect(extractImageSrcs(node)).toEqual([
-      "//images.ctfassets.net/s/id1/v/img1.webp",
-      "//images.ctfassets.net/s/id2/v/img2.webp",
-    ]);
-  });
-});
-
-// ─── renderTaggedBlockquote ───────────────────────────────────────────────────
+// ─── renderTaggedBlockquote ────────────────────────────────────
 
 describe("renderTaggedBlockquote", () => {
-  it("returns null for untagged blockquotes", () => {
-    const children = <p>Regular blockquote content.</p>;
-    expect(renderTaggedBlockquote(children)).toBeNull();
+  it("returns null for untagged blockquotes (falls back to <blockquote>)", () => {
+    renderMdx("> Regular blockquote content.");
+    expect(screen.queryByTestId("callout")).toBeNull();
+    expect(screen.getByRole("blockquote")).toBeTruthy();
   });
 
   it("returns null for blockquotes with unknown tags", () => {
-    const children = "[!UNKNOWN_TAG]\nSome content.";
-    expect(renderTaggedBlockquote(children)).toBeNull();
+    renderMdx(`
+      > [!UNKNOWN]
+      >
+      > Some content.
+    `);
+    expect(screen.queryByTestId("callout")).toBeNull();
   });
 
-  describe("[!INFO]", () => {
-    it("renders a Callout with info variant", () => {
-      const children = "[!INFO]\nImportant Title\nThis is the body.";
-      const result = renderTaggedBlockquote(children);
-      expect(result).not.toBeNull();
-      const { getByTestId } = render(result!);
-      const callout = getByTestId("callout");
-      expect(callout).toHaveAttribute("data-variant", "info");
-      expect(callout).toHaveAttribute("data-title", "Important Title");
-      expect(callout.textContent).toContain("This is the body.");
+  describe("[!INFO] — single paragraph (no title)", () => {
+    it("renders a Callout with info variant and no title", () => {
+      renderMdx(`
+        > [!INFO]
+        >
+        > Just a body paragraph.
+      `);
+      expect(screen.getByTestId("callout")).toHaveAttribute(
+        "data-variant",
+        "info",
+      );
+      expect(screen.queryByTestId("callout-title")).toBeNull();
+      expect(screen.getByTestId("callout-body")).toHaveTextContent(
+        "Just a body paragraph.",
+      );
     });
   });
 
-  describe("[!SUCCESS]", () => {
-    it("renders a Callout with success variant", () => {
-      const children = "[!SUCCESS]\nSuccess Title\nAll good.";
-      const result = renderTaggedBlockquote(children);
-      const { getByTestId } = render(result!);
-      expect(getByTestId("callout")).toHaveAttribute("data-variant", "success");
+  describe("[!INFO] — multiple paragraphs (title + body)", () => {
+    it("uses the first paragraph as title and the rest as body", () => {
+      renderMdx(`
+        > [!INFO]
+        > Important Title
+        >
+        > This is the body.
+      `);
+      expect(screen.getByTestId("callout")).toHaveAttribute(
+        "data-variant",
+        "info",
+      );
+      expect(screen.getByTestId("callout-title")).toHaveTextContent(
+        "Important Title",
+      );
+      expect(screen.getByTestId("callout-body")).toHaveTextContent(
+        "This is the body.",
+      );
     });
   });
 
   describe("[!WARNING]", () => {
     it("renders a Callout with warning variant", () => {
-      const children = "[!WARNING]\nWarning Title\nBe careful.";
-      const result = renderTaggedBlockquote(children);
-      const { getByTestId } = render(result!);
-      expect(getByTestId("callout")).toHaveAttribute("data-variant", "warning");
+      renderMdx(`
+        > [!WARNING]
+        >
+        > Be careful.
+      `);
+      expect(screen.getByTestId("callout")).toHaveAttribute(
+        "data-variant",
+        "warning",
+      );
+    });
+  });
+
+  describe("[!SUCCESS]", () => {
+    it("renders a Callout with success variant", () => {
+      renderMdx(`
+        > [!SUCCESS]
+        >
+        > All good.
+      `);
+      expect(screen.getByTestId("callout")).toHaveAttribute(
+        "data-variant",
+        "success",
+      );
     });
   });
 
   describe("[!ERROR]", () => {
     it("renders a Callout with error variant", () => {
-      const children = "[!ERROR]\nError Title\nSomething went wrong.";
-      const result = renderTaggedBlockquote(children);
-      const { getByTestId } = render(result!);
-      expect(getByTestId("callout")).toHaveAttribute("data-variant", "error");
+      renderMdx(`
+        > [!ERROR]
+        >
+        > Something went wrong.
+      `);
+      expect(screen.getByTestId("callout")).toHaveAttribute(
+        "data-variant",
+        "error",
+      );
     });
   });
 
   describe("[!IMAGE_GALLERY]", () => {
     it("renders an ImageCarousel with ImageCarouselItems for each Contentful asset", () => {
-      const children = (
-        <>
-          {"[!IMAGE_GALLERY]\n"}
-          <img src="//images.ctfassets.net/space/id1/v1/img1.webp" alt="img1" />
-          <img src="//images.ctfassets.net/space/id2/v1/img2.webp" alt="img2" />
-        </>
-      );
-      const result = renderTaggedBlockquote(children);
-      expect(result).not.toBeNull();
-      const { getByTestId, getAllByTestId } = render(result!);
-      expect(getByTestId("image-carousel")).toBeTruthy();
-      const items = getAllByTestId("image-carousel-item");
+      renderMdx(`
+        > [!IMAGE_GALLERY]
+        >
+        > ![img1](//images.ctfassets.net/space/id1/v1/img1.webp)
+        > ![img2](//images.ctfassets.net/space/id2/v1/img2.webp)
+      `);
+      expect(screen.getByTestId("image-carousel")).toBeTruthy();
+      const items = screen.getAllByTestId("image-carousel-item");
       expect(items).toHaveLength(2);
       expect(items[0]).toHaveAttribute("data-asset-id", "id1");
       expect(items[1]).toHaveAttribute("data-asset-id", "id2");

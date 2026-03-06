@@ -9,9 +9,10 @@ tags:
   - development
 status: active
 ---
+
 Dependency injection (DI) frameworks promise to make developer lives easier by layering applications into testable, decoupled components. However, they can quickly result in a mess of autowired classes that exist for no better reason than the framework requires it. Developers often bend their will to the framework, creating ever-more classes with single methods or—at the other extreme—classes with 20 dependencies handling various cross-cutting concerns.
 
-But does it *have* to be that way? Can you fight off the complexity trying to turn your codebase into a plate of Enterprise® spaghetti? More importantly: does your application even *need* a DI container to be clean and testable?
+But does it _have_ to be that way? Can you fight off the complexity trying to turn your codebase into a plate of Enterprise® spaghetti? More importantly: does your application even _need_ a DI container to be clean and testable?
 
 ## What is dependency injection?
 
@@ -44,21 +45,21 @@ Additionally, any other page that needs to fetch a list of posts will need to fo
 Let's move the data fetching logic to `@/lib/data/posts` as the Next.js docs do a little further down:
 
 ```ts
-import { cache } from 'react'
-import { db, posts, eq } from '@/lib/db'
+import { cache } from "react";
+import { db, posts, eq } from "@/lib/db";
 
 export const listPosts = async (limit?: number, skip?: number) => {
-  let query = db.select().from(posts)
-  if (typeof limit === 'number') {
-    query = query.limit(limit)
+  let query = db.select().from(posts);
+  if (typeof limit === "number") {
+    query = query.limit(limit);
   }
-  if (typeof skip === 'number') {
-    query = query.offset(skip)
+  if (typeof skip === "number") {
+    query = query.offset(skip);
   }
 
   const results = await query;
   return results;
-} 
+};
 
 export const getPost = cache(async (id: string) => {
   const post = await db.query.posts.findFirst({
@@ -66,7 +67,7 @@ export const getPost = cache(async (id: string) => {
   });
 
   return post;
-})
+});
 ```
 
 That's better since there's now a programmable interface that helps the Page component get back to its original job:
@@ -92,7 +93,7 @@ export default async function Page() {
 
 We are also now able to reuse that same `@/lib/data/posts` module in other pages or components, such as an RSS feed, a recent posts widget, etc. We've separated "what" (fetching a list of posts) from the "how", meaning we could now simply swap out the implementation for the `listPosts` method in the Page tests. This is called a [facade pattern](https://en.wikipedia.org/wiki/Facade_pattern).
 
-But once you move logic into separate files, the question becomes: how do these pieces talk to each other without becoming a tangled web of `import` statements? In the example above we see `db`, `posts`, and `eq` being imported from `@/lib/db`, but how do *those* get constructed? And how do you test them without resorting to hacks like mocking imports a la [Jest import mocks](https://jestjs.io/docs/manual-mocks)?
+But once you move logic into separate files, the question becomes: how do these pieces talk to each other without becoming a tangled web of `import` statements? In the example above we see `db`, `posts`, and `eq` being imported from `@/lib/db`, but how do _those_ get constructed? And how do you test them without resorting to hacks like mocking imports a la [Jest import mocks](https://jestjs.io/docs/manual-mocks)?
 
 ## Dependency injection frameworks
 
@@ -144,11 +145,11 @@ And then there's local testing versus your deployment environments. That promise
 ### The ugly: components without a purpose
 
 > "But that won't happen to my codebase, I know better!"
-> 
+>
 > -Engineers
 
 > "Wait who the fsck structured it like this? Oh. I mean...who wrote this beautiful spaghetti"
-> 
+>
 > -Also engineers
 
 We've all been there. We start off building beautiful, structured [MVCS](https://en.wikipedia.org/wiki/Model–view–controller) or [DDD](https://en.wikipedia.org/wiki/Domain-driven_design) code and inevitably a deadline approaches or our caffeine-fuelled inspiration gets the best of us and we either spaghetti together some code in a class OR we go overboard and create dedicated, unit-testable classes that are really an injected function in disguise.
@@ -166,24 +167,24 @@ But let's get back to the title of this post. We've established why DI container
 
 ### Dependency tiers
 
-In most applications there tend to be 3-4 tiers of dependencies*:
+In most applications there tend to be 3-4 tiers of dependencies\*:
 
-* **configuration**: the configuration used by all other layers
-  * usually constructed with a combination of environment variables and constants
-* **clients**: "bare metal" clients for interacting with things outside of your runtime (think databases, APIs, etc)
-  * Ideally these are as close to the generated SDK / client library as possible
-  * For REST APIs or other bring your own client scenarios this would be one client per service with methods for each API operation required by your codebase ("write to the SDK you wish existed")
-  * **May only depend on `configuration`**
-* **stores** (aka repositories): handles mapping domain objects to / from storage, such as reading from / writing to databases / APIs or enqueuing a message
-  * Focused on data transformation and persistence
-  * Validation is primarily only on data correctness
-  * Includes minimal business logic
-  * Examples include `UserStore`, `PaymentTransactionStore`
-  * **May only depend on `configuration` and `clients`**
-* **services** / **use cases**: business-level operations to accomplish a single transactional task, optionally wrapped into resource-oriented Service classes
-  * Focused on accomplishing a task, such as `CreateFrienshipConnection` or  `FinalizePaymentTransaction`
-  * **May depend on _any_ of the above or on other `use cases` / `services`**
-* **transport**: The outermost layer that listens for incoming HTTP or gRPC requests, polls for messages via SQS, or parses your CLI arguments. Regardless, the transport layer typically maps the inputs to your internal runtime's shape, fetches data from your `stores` or invokes a `service` / `use case` operation to complete a task, and then maps the result to the correct response (or error) for that transport layer.
+- **configuration**: the configuration used by all other layers
+  - usually constructed with a combination of environment variables and constants
+- **clients**: "bare metal" clients for interacting with things outside of your runtime (think databases, APIs, etc)
+  - Ideally these are as close to the generated SDK / client library as possible
+  - For REST APIs or other bring your own client scenarios this would be one client per service with methods for each API operation required by your codebase ("write to the SDK you wish existed")
+  - **May only depend on `configuration`**
+- **stores** (aka repositories): handles mapping domain objects to / from storage, such as reading from / writing to databases / APIs or enqueuing a message
+  - Focused on data transformation and persistence
+  - Validation is primarily only on data correctness
+  - Includes minimal business logic
+  - Examples include `UserStore`, `PaymentTransactionStore`
+  - **May only depend on `configuration` and `clients`**
+- **services** / **use cases**: business-level operations to accomplish a single transactional task, optionally wrapped into resource-oriented Service classes
+  - Focused on accomplishing a task, such as `CreateFrienshipConnection` or `FinalizePaymentTransaction`
+  - **May depend on _any_ of the above or on other `use cases` / `services`**
+- **transport**: The outermost layer that listens for incoming HTTP or gRPC requests, polls for messages via SQS, or parses your CLI arguments. Regardless, the transport layer typically maps the inputs to your internal runtime's shape, fetches data from your `stores` or invokes a `service` / `use case` operation to complete a task, and then maps the result to the correct response (or error) for that transport layer.
 
 > [!INFO]
 > For simple applications the use case / service layer may be overkill and may be merged into the transport layer. No need to over-architect for the sake of over-architecting.
@@ -196,52 +197,52 @@ With the above philosophical discussion out of the way let's get into what this 
 
 ```typescript
 // src/app/context.ts
-import type { AppConfig } from './config.ts'
+import type { AppConfig } from "./config.ts";
 
 export type AppContext = {
-  config: AppConfig
+  config: AppConfig;
   clients: {
-    db: Knex.Client
-    sqs: SQSClient
-  }
+    db: Knex.Client;
+    sqs: SQSClient;
+  };
   stores: {
-    authors: AuthorStore
-    comments: CommentStore
-    posts: PostStore
-    tags: TagStore
+    authors: AuthorStore;
+    comments: CommentStore;
+    posts: PostStore;
+    tags: TagStore;
     // stores user profiles
     // users could be authors or commenters (or both)
-    users: UserStore
-  }
+    users: UserStore;
+  };
   services: {
-    authors: AuthorService
+    authors: AuthorService;
     // manage comments on posts
-    comments: CommentService
-    posts: PostService
+    comments: CommentService;
+    posts: PostService;
     // user profile management
-    users: UserService
-  }
-}
+    users: UserService;
+  };
+};
 
-export type AppClients = AppContext['clients'];
-export type AppStores = AppContext['stores'];
-export type AppServices = AppContext['services'];
+export type AppClients = AppContext["clients"];
+export type AppStores = AppContext["stores"];
+export type AppServices = AppContext["services"];
 
 export function createAppContext(config: AppConfig): AppContext {
   const clients = {
     db: knex(config.db),
     sqs: new SQSClient(config.aws),
-  }
+  };
 
   const stores = {
-    // NOTE: do not destructure the dependencies 
+    // NOTE: do not destructure the dependencies
     // This will be important when it comes to testing
     authors: new AuthorStore(clients),
     comments: new CommentStore(clients),
     tags: new TagStore(clients),
     posts: new PostStore(clients),
     users: new UserStore(clients),
-  }
+  };
 
   // user service is needed by the other services
   // construct it outside and inject it
@@ -252,7 +253,7 @@ export function createAppContext(config: AppConfig): AppContext {
     comments: new CommentService(stores, { userService }),
     posts: new PostService(stores, { userService }),
     users: userService,
-  }
+  };
 
   return { config, clients, stores, services };
 }
@@ -298,9 +299,9 @@ export function UserAvatarImage({ avatarUrl, displayName }: UserAvatarProps) {
 
 Using these derivative types provides a few benefits:
 
-* **Better documentation**: declare what exact fields you need
-* **Easier testing**: inputs only need to implement the declared fields
-* **Compile time safety**: fail compilation if an undeclared field is used
+- **Better documentation**: declare what exact fields you need
+- **Easier testing**: inputs only need to implement the declared fields
+- **Compile time safety**: fail compilation if an undeclared field is used
 
 > [!WARNING]
 > Remember that types are only focused on **compile time** safety, meaning typing information does not restrict or prevent the data that appears at runtime. Always check and sanitize your inputs at application edges and never rely purely on types for enforcing what data is or is not available.
@@ -309,25 +310,24 @@ So back to declaring dependencies in your app. Let's say you need the DB client 
 
 ```typescript
 // src/users/user-store.ts
-import type { AppClients } from '../context';
-import type { User, CreateUserInput } from './types';
+import type { AppClients } from "../context";
+import type { User, CreateUserInput } from "./types";
 
 // declare your client dependencies
 // NOTE: no need to export this type
-type ClientDeps = Pick<AppClients, 'db'>
+type ClientDeps = Pick<AppClients, "db">;
 
-export class UserStore { 
-  constructor(
-    private clients: ClientDeps
-  ) {}
+export class UserStore {
+  constructor(private clients: ClientDeps) {}
 
   async create(input: CreateUserInput, opts?: StoreOpts = {}): Promise<User> {
     const trx = opts.transaction ?? this.clients.db.transaction();
 
     const encoded = this.encodeRecord(input);
-    const result = await this.clients.db('users')
+    const result = await this.clients
+      .db("users")
       .insert(encoded)
-      .transacting(trx)
+      .transacting(trx);
 
     return this.decodeRecord(result);
   }
@@ -339,7 +339,7 @@ export class UserStore {
 TypeScript will complain if you try to access `this.clients.sqs` since it's not declared in `ClientDeps`, giving you compile-time safety.
 
 ```typescript
-export class UserStore { 
+export class UserStore {
   constructor(
     private clients: ClientDeps
   ) {}
@@ -352,7 +352,7 @@ export class UserStore {
       .insert(encoded)
       .transacting(trx)
 
-    // ERROR: "Property 'sqs' does not exist on type 'ClientDeps'"  
+    // ERROR: "Property 'sqs' does not exist on type 'ClientDeps'"
     await this.clients.sqs.sendMessage({ ... })
 
     return this.decodeRecord(result);
@@ -383,11 +383,11 @@ import {
 // Extend AppContext with mocks and teardown
 type TestContext = AppContext & {
   mocks: {
-    localStack: StartedLocalStackContainer
-    postgres: StartedPostgreSQLContainer
-  }
-  teardown(): Promise<void>
-}
+    localStack: StartedLocalStackContainer;
+    postgres: StartedPostgreSQLContainer;
+  };
+  teardown(): Promise<void>;
+};
 
 export async function createTestContext(): Promise<TestContext> {
   const localStack = await new LocalStackContainer(LOCALSTACK_IMAGE).start();
@@ -396,7 +396,7 @@ export async function createTestContext(): Promise<TestContext> {
   const mocks = {
     localStack,
     postgres,
-  }
+  };
 
   const config = {
     ...appConfig,
@@ -405,16 +405,13 @@ export async function createTestContext(): Promise<TestContext> {
       endpoint: localstack.getConnectionUri(),
     },
     db: {
-      client: 'pg',
-      connection: container.getConnectionUri()
-    }
-  }
+      client: "pg",
+      connection: container.getConnectionUri(),
+    },
+  };
 
   // Stops test containers to free up the ports, etc
-  const teardown = () => Promise.all([
-    localStack.stop(),
-    postgres.stop()
-  ])
+  const teardown = () => Promise.all([localStack.stop(), postgres.stop()]);
 
   return { ...createAppContext(config), mocks, teardown };
 }
@@ -423,7 +420,7 @@ export async function createTestContext(): Promise<TestContext> {
 Then in your tests you have access to all layers of your `TestContext`:
 
 ```typescript
-describe('UserService', () => {
+describe("UserService", () => {
   let testContext: TestContext;
 
   beforeEach(async () => {
@@ -433,21 +430,21 @@ describe('UserService', () => {
   });
 
   afterEach(async () => {
-    await testContext.teardown()
-  })
+    await testContext.teardown();
+  });
 
-  it('activateUser() sends an SQS message', async () => {
-    const sendSpy = jest.spyOn(testContext.clients.sqs, 'sendMessage')
+  it("activateUser() sends an SQS message", async () => {
+    const sendSpy = jest.spyOn(testContext.clients.sqs, "sendMessage");
 
     // do the thing
 
-    expect(sendSpy).toHaveBeenCalled()
+    expect(sendSpy).toHaveBeenCalled();
   });
-})
+});
 ```
 
 > [!INFO]
->  I want to go a bit more in depth on testing strategies that have worked well for me in the past, but I'll save that for a different post.
+> I want to go a bit more in depth on testing strategies that have worked well for me in the past, but I'll save that for a different post.
 
 ## Scaling your ~legacy~ legendary masterpiece
 
@@ -457,18 +454,18 @@ Again, monoliths don't have to be legacy horror stories, they can be legendary m
 
 ## When does DI make sense?
 
-If your application is already running within a DI framework, use it! Again, dependency injection in its own right is not evil and serves a purpose. But try to use it when it adds value, don't just create `@Injectable` components everywhere just because the framework forces you to do so. 
+If your application is already running within a DI framework, use it! Again, dependency injection in its own right is not evil and serves a purpose. But try to use it when it adds value, don't just create `@Injectable` components everywhere just because the framework forces you to do so.
 
 Regardless of whether you use a DI container or not, the point still stands that having a list of component stereotypes with singular, focused responsibilities will extend the life of your application's maintainability and make testing significantly easier and more focused.
 
 Alongside clients, stores, and use cases / services I typically find these other component stereotypes to be helpful in more complex situations:
 
-* **Codecs**: `encode()` and `decode()` your domain / business object to and from external shapes (e.g. database records, legacy API shapes) with **no additional data fetches**
-	* Used by **stores** (e.g. to/from a document or SQL record) and **transport layer** (e.g. to/from HTTP or Protobuf)
-	* **Easy to unit test**: domain object in, transformed object out
-* **Resolvers**: given a set of domain object inputs calculates a resultant set of outputs
-	* Used by **use cases** (e.g. given these hardcoded defaults, these A/B treatment variants, and this customer's preferences generate a fully resolved preferences object)
-	* **Easy to unit test**: create a set of inputs to trigger different states, no stubbed API calls required
+- **Codecs**: `encode()` and `decode()` your domain / business object to and from external shapes (e.g. database records, legacy API shapes) with **no additional data fetches**
+  - Used by **stores** (e.g. to/from a document or SQL record) and **transport layer** (e.g. to/from HTTP or Protobuf)
+  - **Easy to unit test**: domain object in, transformed object out
+- **Resolvers**: given a set of domain object inputs calculates a resultant set of outputs
+  - Used by **use cases** (e.g. given these hardcoded defaults, these A/B treatment variants, and this customer's preferences generate a fully resolved preferences object)
+  - **Easy to unit test**: create a set of inputs to trigger different states, no stubbed API calls required
 
 ## Alternative design patterns
 
@@ -476,8 +473,7 @@ As with all things there are other design patterns that you may fit either your 
 
 A few examples:
 
-* Model-View-Controller (MVC/MVCS/MVVM)
-* [Domain driven design](https://martinfowler.com/bliki/DomainDrivenDesign.html)
+- Model-View-Controller (MVC/MVCS/MVVM)
+- [Domain driven design](https://martinfowler.com/bliki/DomainDrivenDesign.html)
 
 In the end, the main thing is that your **components have specific stereotypes / roles to play** and stay in their lane. Yes, sometimes you may need to violate the design pattern for better readability or to co-locate some gnarly code to hide its interface and that's okay. But patterns are there to help with predictability, maintainability, and separation of concerns. It also helps for faster onboarding of others into your codebase since they can see the pattern and replicate it for any new contributions.
-
