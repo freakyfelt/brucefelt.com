@@ -240,14 +240,27 @@ export class JsonFilesystemStorage<
   }
 
   protected async encodeItem(item: T): Promise<string> {
-    const validated = this.schema ? this.schema.parse(item) : item;
-    return JSON.stringify(validated, null, 2);
+    try {
+      const validated = this.schema ? this.schema.parse(item) : item;
+      return JSON.stringify(validated, null, 2);
+    } catch (e: unknown) {
+      if (e instanceof z.ZodError) {
+        throw new Error(`Cannot persist ${item.slug}: ${e}`, { cause: e });
+      }
+      throw e;
+    }
   }
 
   protected async decodeItem(file: File): Promise<T> {
     const content = await file.text();
     const parsed = JSON.parse(content) as T;
-    return this.schema ? (this.schema.parse(parsed) as T) : parsed;
+    try {
+      return this.schema ? (this.schema.parse(parsed) as T) : parsed;
+    } catch (e: unknown) {
+      throw new Error(`Error parsing content in ${file.path}: ${e}`, {
+        cause: e,
+      });
+    }
   }
 }
 
@@ -295,7 +308,9 @@ export class MdxFilesystemStorage<
 
       return { ...frontmatter, content } as unknown as T;
     } catch (e: unknown) {
-      throw new Error(`Error parsing frontmatter in ${file.path}: ${e}`);
+      throw new Error(`Error parsing frontmatter in ${file.path}: ${e}`, {
+        cause: e,
+      });
     }
   }
 
