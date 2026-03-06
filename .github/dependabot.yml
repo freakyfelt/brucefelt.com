@@ -46,12 +46,9 @@ updates:
         dependency-type: "production"
         patterns:
           - "react"
-          - "react-dom"
-          - "react-icons"
-          - "react-syntax-highlighter"
+          - "react-*"
           - "@types/react"
-          - "@types/react-dom"
-          - "@types/react-syntax-highlighter"
+          - "@types/react-*"
           - "@radix-ui/*"
           - "tailwindcss"
           - "@tailwindcss/*"
@@ -61,8 +58,7 @@ updates:
           - "clsx"
           - "lucide-react"
           - "embla-carousel-react"
-      # Development dependencies - Build tools and testing
-      dev:
+      test:
         dependency-type: "development"
         patterns:
           - "@playwright/test"
@@ -72,12 +68,19 @@ updates:
           - "@testing-library/*"
           - "jsdom"
           - "msw"
+      # Development dependencies - Build tools and testing
+      lint:
+        dependency-type: "development"
+        patterns:
           - "prettier"
           - "eslint"
-          - "eslint-config-next"
+          - "eslint-*"
+      # Development dependencies - Build tools and testing
+      dev:
+        dependency-type: "development"
+        patterns:
           - "typescript"
           - "@types/*"
-          - "@types/node"
           - "tsx"
           - "dotenv"
           - "serve"
