@@ -1,0 +1,100 @@
+# Dependabot configuration for automated dependency updates
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+#
+# Version update strategies:
+# - Patch updates: Auto-merged automatically (configure via GitHub repository settings)
+# - Minor updates: Require review workflow (default behavior - creates PRs)
+# - Major updates: Require manual approval (default behavior - creates PRs)
+#
+# Grouping strategy:
+# - server: Next.js runtime and MDX processing
+# - ui: React components and styling libraries
+# - dev: Build process and development tools
+
+version: 2
+updates:
+  # npm packages - main dependency manager for Next.js application
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+    # Group dependencies by function to minimize PRs
+    groups:
+      # Server/runtime dependencies - Next.js and MDX processing
+      server:
+        dependency-type: "production"
+        patterns:
+          - "next"
+          - "@next/*"
+          - "next-themes"
+          - "@mdx-js/*"
+          - "@types/mdx"
+          - "remark-*"
+          - "remark-rehype"
+      # UI dependencies - React components and styling
+      ui:
+        dependency-type: "production"
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-icons"
+          - "react-syntax-highlighter"
+          - "@types/react"
+          - "@types/react-dom"
+          - "@types/react-syntax-highlighter"
+          - "@radix-ui/*"
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "tailwind-merge"
+          - "tailwindcss-animate"
+          - "class-variance-authority"
+          - "clsx"
+          - "lucide-react"
+          - "embla-carousel-react"
+      # Development dependencies - Build tools and testing
+      dev:
+        dependency-type: "development"
+        patterns:
+          - "@playwright/test"
+          - "playwright"
+          - "vitest"
+          - "@vitest/*"
+          - "@testing-library/*"
+          - "jsdom"
+          - "msw"
+          - "prettier"
+          - "eslint"
+          - "eslint-config-next"
+          - "typescript"
+          - "@types/*"
+          - "@types/node"
+          - "tsx"
+          - "dotenv"
+          - "serve"
+          - "yaml"
+
+  # GitHub Actions - CI/CD workflow updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
