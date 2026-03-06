@@ -1,0 +1,43 @@
+version: 2
+updates:
+  # npm packages - main dependency manager for Next.js application
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+    versioning-strategy: increase
+    # Group dependencies by type to minimize PRs
+    groups:
+      # Development dependencies
+      dev-dependencies:
+        dependency-type: "development"
+      # Production dependencies
+      production-dependencies:
+        dependency-type: "production"
+
+  # GitHub Actions - CI/CD workflow updates
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    versioning-strategy: increase
