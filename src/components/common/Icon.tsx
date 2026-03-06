@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  SiGithub,
-  SiLinkedin,
-  SiX,
-  SiBluesky,
-  SiInstagram,
-} from "react-icons/si";
+import { SiGithub, SiX, SiBluesky, SiInstagram } from "react-icons/si";
 import {
   LuSun,
   LuMoon,
@@ -16,11 +10,12 @@ import {
   LuCheck,
   LuCircleX,
 } from "react-icons/lu";
+import { FaLinkedin } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
 
 export const ICONS = {
   github: SiGithub,
-  linkedin: SiLinkedin,
+  linkedin: FaLinkedin,
   twitter: SiX,
   bluesky: SiBluesky,
   instagram: SiInstagram,
