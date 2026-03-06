@@ -51,7 +51,7 @@ jobs:
           CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
 
       - name: Install Playwright browser
-        run: npx playwright install ${{ matrix.browser }}
+        run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run end-to-end tests
         run: npm run test:e2e -- --project=${{ matrix.browser }}
