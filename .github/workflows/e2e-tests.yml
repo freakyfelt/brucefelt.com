@@ -31,11 +31,11 @@ jobs:
           node-version-file: .nvmrc
           cache: "npm"
 
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps ${{ matrix.browser }}
-
       - name: Install dependencies
         run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Cache Next.js
         uses: actions/cache@v4
