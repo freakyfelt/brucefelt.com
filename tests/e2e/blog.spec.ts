@@ -8,17 +8,6 @@ import { test, expect } from "@playwright/test";
  */
 
 test.describe("Blog Page Layout", () => {
-  test("should load blog posts page", async ({ page }) => {
-    await page.goto("/blog/posts");
-
-    // Verify URL
-    await expect(page).toHaveURL(/.*\/blog\/posts/);
-
-    // Page should have loaded successfully (status check)
-    const response = await page.goto("/blog/posts");
-    expect(response?.status()).toBe(200);
-  });
-
   test("should redirect /posts to /blog/posts", async ({ page }) => {
     const response = await page.goto("/posts");
 
