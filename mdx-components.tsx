@@ -2,7 +2,10 @@ import type { MDXComponents } from "mdx/types";
 import { Heading } from "@/components/common/Heading";
 import { ExternalLink } from "@/components/common/Link";
 import { CodeBlock, InlineCode } from "@/components/common/Code";
-import { renderTaggedBlockquote } from "@/lib/app/utils/mdx/blockquote-renderer";
+import { parseTaggedBlockquote } from "@/lib/utils/mdx/blockquote-renderer";
+import { BLOCKQUOTE_HANDLERS } from "@/components/mdx/blockquote-handlers";
+
+const isDev = process.env.NEXT_PHASE !== "phase-production-server";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -10,7 +13,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <ExternalLink href={href}>{children}</ExternalLink>
     ),
     blockquote: ({ children }) => {
-      const tagged = renderTaggedBlockquote(children);
+      const tagged = parseTaggedBlockquote({
+        children,
+        handlers: BLOCKQUOTE_HANDLERS,
+        strict: isDev,
+      });
       if (tagged) return tagged;
       return (
         <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">

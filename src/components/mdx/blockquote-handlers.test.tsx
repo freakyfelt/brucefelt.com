@@ -3,9 +3,8 @@ import { describe, it, expect, vi } from "vitest";
 import * as runtime from "react/jsx-runtime";
 import { evaluateSync } from "@mdx-js/mdx";
 import { render, screen } from "@testing-library/react";
-import {
-  renderTaggedBlockquote,
-} from "./blockquote-renderer";
+import { BLOCKQUOTE_HANDLERS } from "./blockquote-handlers";
+import { parseTaggedBlockquote } from "@/lib/utils/mdx/blockquote-renderer";
 
 vi.mock("@/components/common/Callout", () => ({
   Callout: ({
@@ -54,7 +53,10 @@ function renderMdx(content: string) {
     <MDXContent
       components={{
         blockquote: ({ children }: { children?: React.ReactNode }) => {
-          const result = renderTaggedBlockquote(children);
+          const result = parseTaggedBlockquote({
+            children,
+            handlers: BLOCKQUOTE_HANDLERS,
+          });
           if (result) return result;
           return <blockquote>{children}</blockquote>;
         },
@@ -65,9 +67,7 @@ function renderMdx(content: string) {
   return container;
 }
 
-// ─── renderTaggedBlockquote ────────────────────────────────────
-
-describe("renderTaggedBlockquote", () => {
+describe("handleBlockquoteTags", () => {
   it("returns null for untagged blockquotes (falls back to <blockquote>)", () => {
     renderMdx("> Regular blockquote content.");
     expect(screen.queryByTestId("callout")).toBeNull();

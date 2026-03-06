@@ -1,6 +1,6 @@
 import { appContext, AppContext } from "@/lib/app/context";
 import { staticImageAssets } from "@/lib/data/assets";
-import { extractContentfulAssetIds } from "@/lib/app/utils/mdx/asset-scanner";
+import { extractContentfulAssetIds } from "@/lib/app/utils/asset-scanner";
 
 type ImportResults = {
   tags: string[];
