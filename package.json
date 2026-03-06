@@ -60,7 +60,7 @@
     "jsdom": "^27.3.0",
     "msw": "^2.12.7",
     "prettier": "^3",
-    "serve": "^14.2.5",
+    "serve": "^14.2.6",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
