@@ -38,9 +38,6 @@ export function createAppContext(config: AppConfig) {
     blogPosts: clients.storage.forMdx<RawPost, Post>({
       pathPrefix: "blog/posts",
     }),
-    rawBlogPosts: clients.storage.forMarkdown<RawPost, Post>({
-      pathPrefix: "raw/blog/posts",
-    }),
     blogTags: clients.storage.forJSON<Tag>({ pathPrefix: "blog/tags" }),
     imageAssets: clients.storage.forJSON<ImageAsset>({
       pathPrefix: "assets/images",

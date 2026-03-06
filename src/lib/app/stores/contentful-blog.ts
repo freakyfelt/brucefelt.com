@@ -43,6 +43,18 @@ export type ContentfulPostMetadata = Pick<
   "slug" | "tagsCollection"
 >;
 
+const TAG_QUERY = `
+query FetchTags($slugs: [String], $limit: Int, $skip: Int = 0) {
+  tagCollection(where: {slug_in: $slugs}, limit: $limit, skip: $skip) {
+    items {
+      slug
+      displayName
+      description
+    }
+  }
+}
+`;
+
 const POST_CONTENT_QUERY = `
 query FetchBlogPosts($slugs: [String], $limit: Int, $skip: Int = 0) {
   blogPostCollection(where: {slug_in: $slugs}, limit: $limit, skip: $skip) {
@@ -134,6 +146,14 @@ export class ContentfulBlogStore {
     return this.client.batchFetch(POST_CONTENT_QUERY, { slugs }, 10, (data) => {
       const posts = data!.blogPostCollection!.items as ContentfulPost[];
       return posts.map(decodeContentfulPost);
+    });
+  }
+
+  async getTagsBySlugs(slugs: string[]): Promise<Tag[]> {
+    if (slugs.length === 0) return [];
+
+    return this.client.batchFetch(TAG_QUERY, { slugs }, 100, (data) => {
+      return data!.tagCollection!.items as Tag[];
     });
   }
 

@@ -2,16 +2,20 @@ import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import path from "path";
 import { ImportPostsTask } from "./import-posts";
 import { createTestContext, TestContext } from "@test/context";
-import { mockContentfulPost, post1 } from "@test/fixtures/posts";
+import { mockRawPost, post1 } from "@test/fixtures/posts";
 import { tag1 } from "@test/fixtures/tags";
 import { asset1, asset2 } from "@test/fixtures/assets";
 
 describe("ImportPostsTask", () => {
   let context: TestContext;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     context = createTestContext();
     context.mocks.graphql.start();
+
+    // Pre-populate the blog posts directory with a raw .mdx file
+    // (simulating the source-of-truth files already being present)
+    await context.stores.blogPosts.writeAll([mockRawPost]);
   });
 
   afterEach(() => {
@@ -19,34 +23,14 @@ describe("ImportPostsTask", () => {
     context.teardown();
   });
 
-  it("should import posts and tags correctly", async () => {
-    // Register expected queries
+  it("should import tags and assets from Contentful based on local post content", async () => {
     context.mocks.graphql.expectQuery({
-      operationName: "FetchAllPostSlugs",
-      variables: { limit: 100, skip: 0 },
+      operationName: "FetchTags",
+      variables: { slugs: [tag1.slug], limit: 100, skip: 0 },
       response: {
         data: {
-          blogPostCollection: {
-            items: [
-              {
-                slug: post1.slug,
-                tagsCollection: {
-                  items: [tag1],
-                },
-              },
-            ],
-          },
-        },
-      },
-    });
-
-    context.mocks.graphql.expectQuery({
-      operationName: "FetchBlogPosts",
-      variables: { slugs: ["post-1"], limit: 10, skip: 0 },
-      response: {
-        data: {
-          blogPostCollection: {
-            items: [mockContentfulPost],
+          tagCollection: {
+            items: [tag1],
           },
         },
       },
@@ -68,7 +52,6 @@ describe("ImportPostsTask", () => {
       },
     });
 
-    const blogPostsSpy = vi.spyOn(context.stores.blogPosts, "writeAll");
     const blogTagsSpy = vi.spyOn(context.stores.blogTags, "writeAll");
     const imageAssetsSpy = vi.spyOn(context.stores.imageAssets, "writeAll");
 
@@ -88,22 +71,16 @@ describe("ImportPostsTask", () => {
       deleteExisting: true,
     });
 
-    // Check that posts were written with transformed content
-    expect(blogPostsSpy).toHaveBeenCalled();
-    const writtenPosts = blogPostsSpy.mock.calls[0][0];
-    expect(writtenPosts[0].content).not.toContain("//images.ctfassets.net");
-
     const rootDir = context.config.storage.rootDir;
     expect(results).toEqual({
-      posts: [path.join(rootDir, "blog/posts/post-1.mdx")],
       tags: [path.join(rootDir, "blog/tags/tag-1.json")],
       assets: [
         path.join(rootDir, "assets/images/id1.json"),
         path.join(rootDir, "assets/images/5X0ig9hXwUzwXITz03HOS1.json"),
       ],
-      raw: {
-        posts: [path.join(rootDir, "raw/blog/posts/post-1.md")],
-      },
     });
+
+    // Verify post1 slug is used (fixture sanity check)
+    expect(post1.slug).toBe("post-1");
   });
 });

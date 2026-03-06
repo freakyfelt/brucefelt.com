@@ -40,15 +40,6 @@ export class FilesystemStorage {
     });
   }
 
-  forMarkdown<TRaw extends HasSlug & HasContent, T extends HasSlug>(
-    config: Omit<MarkdownFilesystemStorageConfig, "rootDir">,
-  ) {
-    return new MarkdownFilesystemStorage<TRaw, T>({
-      rootDir: this.config.rootDir,
-      ...config,
-    });
-  }
-
   forMdx<TRaw extends HasSlug & HasContent, T extends HasSlug>(
     config: Omit<MarkdownFilesystemStorageConfig, "rootDir">,
   ) {
@@ -88,6 +79,27 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
 
     const allData = this.listFiles().map(async (file) => {
       return this.decodeItem(file);
+    });
+
+    return Promise.all(allData);
+  }
+
+  /**
+   * Reads all files as plain text, parsing YAML frontmatter and returning
+   * the raw data without going through the MDX compiler.
+   */
+  async readAllAsText(): Promise<TRaw[]> {
+    this.assertBasePath();
+
+    const allData = this.listFiles().map(async (file) => {
+      const text = await file.text();
+      const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+      if (!match) {
+        throw new Error(`Invalid frontmatter in ${file.name}`);
+      }
+      const frontmatter = Yaml.parse(match[1]);
+      const content = match[2].trim();
+      return { ...frontmatter, content } as unknown as TRaw;
     });
 
     return Promise.all(allData);
@@ -166,7 +178,7 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
     };
   }
 
-  private listFiles(): File[] {
+  protected listFiles(): File[] {
     const fileNames = fs
       .readdirSync(this.basePath)
       .filter((fileName) => fileName.endsWith(this.config.extension));
@@ -185,7 +197,7 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
     });
   }
 
-  private assertBasePath() {
+  protected assertBasePath() {
     if (!fs.existsSync(this.basePath)) {
       throw new Error(
         `No data found in the data directory. Need to run \`npm run import\``,
@@ -262,30 +274,28 @@ export class MdxFilesystemStorage<
 
     return { ...frontmatter, content } as unknown as T;
   }
-}
 
-export class MarkdownFilesystemStorage<
-  TRaw extends HasContent & HasSlug,
-  T extends HasSlug,
-> extends BaseFilesystemStorage<T, TRaw> {
-  constructor(private mdConfig: MarkdownFilesystemStorageConfig) {
-    super({
-      extension: "md",
-      ...mdConfig,
+  /**
+   * Reads all .mdx files as plain text, parsing YAML frontmatter manually
+   * and returning raw data with string content.
+   *
+   * Use this in build-time scripts where the MDX compiler is not available.
+   * Handles both LF and CRLF line endings.
+   */
+  async readAllRaw(): Promise<TRaw[]> {
+    this.assertBasePath();
+
+    const allData = this.listFiles().map(async (file) => {
+      const text = (await file.text()).replace(/\r\n/g, "\n");
+      const match = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+      if (!match) {
+        throw new Error(`Invalid frontmatter in ${file.name}`);
+      }
+      const frontmatter = Yaml.parse(match[1]);
+      const content = match[2].trim();
+      return { ...frontmatter, content } as unknown as TRaw;
     });
-  }
-  protected async encodeItem(item: TRaw): Promise<string> {
-    const { content, ...rest } = item;
-    const yaml = Yaml.stringify(rest);
 
-    return `---\n${yaml}---\n${content}\n`;
-  }
-
-  protected async decodeItem(file: File): Promise<T> {
-    const { default: content, frontmatter } = await import(
-      `@data/${file.path}`
-    );
-
-    return { ...frontmatter, content } as unknown as T;
+    return Promise.all(allData);
   }
 }

@@ -2,14 +2,22 @@ import type { MDXComponents } from "mdx/types";
 import { Heading } from "@/components/common/Heading";
 import { ExternalLink } from "@/components/common/Link";
 import { CodeBlock, InlineCode } from "@/components/common/Code";
-import { Callout } from "@/components/common/Callout";
-import {
-  ImageCarousel,
-  ImageCarouselItem,
-} from "@/components/images/ImageCarousel";
+import { renderTaggedBlockquote } from "@/lib/app/utils/mdx/blockquote-renderer";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
+    a: ({ href, children }) => (
+      <ExternalLink href={href}>{children}</ExternalLink>
+    ),
+    blockquote: ({ children }) => {
+      const tagged = renderTaggedBlockquote(children);
+      if (tagged) return tagged;
+      return (
+        <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">
+          {children}
+        </blockquote>
+      );
+    },
     code: ({ children, className }) => {
       if (typeof children !== "string") {
         return <code>{children}</code>;
@@ -32,17 +40,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ul: ({ children }) => <ul className="list-disc pl-6 mb-2">{children}</ul>,
     ol: ({ children }) => <ol className="list-decimal pl-6">{children}</ol>,
     li: ({ children }) => <li>{children}</li>,
-    blockquote: ({ children }) => (
-      <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">
-        {children}
-      </blockquote>
-    ),
-    Callout,
-    a: ({ href, children }) => (
-      <ExternalLink href={href}>{children}</ExternalLink>
-    ),
-    ImageCarousel,
-    ImageCarouselItem,
     ...components,
   };
 }
