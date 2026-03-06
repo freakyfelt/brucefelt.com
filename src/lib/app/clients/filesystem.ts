@@ -48,6 +48,15 @@ export class FilesystemStorage {
       ...config,
     });
   }
+
+  forMdx<TRaw extends HasSlug & HasContent, T extends HasSlug>(
+    config: Omit<MarkdownFilesystemStorageConfig, "rootDir">,
+  ) {
+    return new MdxFilesystemStorage<TRaw, T>({
+      rootDir: this.config.rootDir,
+      ...config,
+    });
+  }
 }
 
 type BaseFilesystemStorageConfig = {
@@ -229,13 +238,39 @@ type MarkdownFilesystemStorageConfig = Omit<
 /**
  * Outputs a markdown file with frontmatter
  */
-export class MarkdownFilesystemStorage<
+export class MdxFilesystemStorage<
   TRaw extends HasContent & HasSlug,
   T extends HasSlug,
 > extends BaseFilesystemStorage<T, TRaw> {
   constructor(private mdConfig: MarkdownFilesystemStorageConfig) {
     super({
       extension: "mdx",
+      ...mdConfig,
+    });
+  }
+  protected async encodeItem(item: TRaw): Promise<string> {
+    const { content, ...rest } = item;
+    const yaml = Yaml.stringify(rest);
+
+    return `---\n${yaml}---\n${content}\n`;
+  }
+
+  protected async decodeItem(file: File): Promise<T> {
+    const { default: content, frontmatter } = await import(
+      `@data/${file.path}`
+    );
+
+    return { ...frontmatter, content } as unknown as T;
+  }
+}
+
+export class MarkdownFilesystemStorage<
+  TRaw extends HasContent & HasSlug,
+  T extends HasSlug,
+> extends BaseFilesystemStorage<T, TRaw> {
+  constructor(private mdConfig: MarkdownFilesystemStorageConfig) {
+    super({
+      extension: "md",
       ...mdConfig,
     });
   }

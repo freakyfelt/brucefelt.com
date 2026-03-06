@@ -35,8 +35,11 @@ export function createAppContext(config: AppConfig) {
 
   const stores = {
     contentfulBlog: new ContentfulBlogStore(clients.contentful),
-    blogPosts: clients.storage.forMarkdown<RawPost, Post>({
+    blogPosts: clients.storage.forMdx<RawPost, Post>({
       pathPrefix: "blog/posts",
+    }),
+    rawBlogPosts: clients.storage.forMarkdown<RawPost, Post>({
+      pathPrefix: "raw/blog/posts",
     }),
     blogTags: clients.storage.forJSON<Tag>({ pathPrefix: "blog/tags" }),
     imageAssets: clients.storage.forJSON<ImageAsset>({

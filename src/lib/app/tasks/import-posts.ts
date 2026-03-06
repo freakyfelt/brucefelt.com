@@ -7,6 +7,9 @@ type ImportResults = {
   posts: string[];
   tags: string[];
   assets: string[];
+  raw: {
+    posts: string[];
+  };
 };
 
 export class ImportPostsTask {
@@ -18,8 +21,17 @@ export class ImportPostsTask {
     const rawPosts =
       await this.context.stores.contentfulBlog.getBlogPosts(slugs);
 
+    // Phase 1: Write raw markdown files
+    const rawPostPaths = await this.context.stores.rawBlogPosts.writeAll(
+      rawPosts,
+      {
+        deleteExisting: true,
+      },
+    );
+
+    // Phase 2: Process raw markdown files to MDX
     const allAssetIds = new Set<string>(Object.values(staticImageAssets));
-    const posts = rawPosts.map((post) => {
+    const processedPosts = rawPosts.map((post) => {
       const { transformedContent, assetIds } = transformMarkdownContent(
         post.content,
       );
@@ -49,11 +61,19 @@ export class ImportPostsTask {
     const tagPaths = await this.context.stores.blogTags.writeAll(tags, {
       deleteExisting: true,
     });
-    const postPaths = await this.context.stores.blogPosts.writeAll(posts, {
-      deleteExisting: true,
-    });
+    const postPaths = await this.context.stores.blogPosts.writeAll(
+      processedPosts,
+      {
+        deleteExisting: true,
+      },
+    );
 
-    return { posts: postPaths, tags: tagPaths, assets: assetPaths };
+    return {
+      posts: postPaths,
+      tags: tagPaths,
+      assets: assetPaths,
+      raw: { posts: rawPostPaths },
+    };
   }
 }
 

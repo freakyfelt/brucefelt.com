@@ -101,6 +101,9 @@ describe("ImportPostsTask", () => {
         path.join(rootDir, "assets/images/id1.json"),
         path.join(rootDir, "assets/images/5X0ig9hXwUzwXITz03HOS1.json"),
       ],
+      raw: {
+        posts: [path.join(rootDir, "raw/blog/posts/post-1.md")],
+      },
     });
   });
 });
