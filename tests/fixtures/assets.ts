@@ -7,7 +7,7 @@ export const asset1: RawImageAsset = {
   contentType: "image/jpeg",
   width: 100,
   height: 100,
-  url: "url1",
+  url: "https://example.com/images/f.jpg",
 };
 
 export const asset2: RawImageAsset = {
@@ -17,5 +17,5 @@ export const asset2: RawImageAsset = {
   contentType: "image/jpeg",
   width: 200,
   height: 200,
-  url: "static-url",
+  url: "https://example.com/images/static.jpg",
 };

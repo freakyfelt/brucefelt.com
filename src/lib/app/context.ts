@@ -1,14 +1,14 @@
+import { ImageAsset, ImageAssetSchema } from "@/interfaces/image-asset";
+import { Post, PostSchema, RawPost } from "@/interfaces/post";
+import { Tag, TagSchema } from "@/interfaces/tag";
 import "dotenv/config";
 import path from "path";
-import { FilesystemStorage, StorageConfig } from "./clients/filesystem";
 import {
   ContentfulConfig,
   ContentfulGraphQLClient,
 } from "./clients/contentful";
-import { Post, RawPost } from "@/interfaces/post";
-import { Tag } from "@/interfaces/tag";
+import { FilesystemStorage, StorageConfig } from "./clients/filesystem";
 import { ContentfulBlogStore } from "./stores/contentful-blog";
-import { ImageAsset } from "@/interfaces/image-asset";
 
 export type AppConfig = {
   contentful: ContentfulConfig;
@@ -37,10 +37,15 @@ export function createAppContext(config: AppConfig) {
     contentfulBlog: new ContentfulBlogStore(clients.contentful),
     blogPosts: clients.storage.forMdx<RawPost, Post>({
       pathPrefix: "blog/posts",
+      schema: PostSchema,
     }),
-    blogTags: clients.storage.forJSON<Tag>({ pathPrefix: "blog/tags" }),
+    blogTags: clients.storage.forJSON<Tag>({
+      pathPrefix: "blog/tags",
+      schema: TagSchema,
+    }),
     imageAssets: clients.storage.forJSON<ImageAsset>({
       pathPrefix: "assets/images",
+      schema: ImageAssetSchema,
     }),
   };
 

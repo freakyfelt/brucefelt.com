@@ -2,8 +2,13 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { FilesystemStorage, MdxFilesystemStorage } from "./filesystem";
+import {
+  FilesystemStorage,
+  JsonFilesystemStorage,
+  MdxFilesystemStorage,
+} from "./filesystem";
 import { RawPost, Post } from "@/interfaces/post";
+import { ImageAsset, ImageAssetSchema } from "@/interfaces/image-asset";
 
 describe("MdxFilesystemStorage.readAllRaw", () => {
   let tmpDir: string;
@@ -104,5 +109,108 @@ describe("MdxFilesystemStorage.readAllRaw", () => {
     await expect(store.readAllRaw()).rejects.toThrow(
       "No data found in the data directory",
     );
+  });
+});
+
+describe("JsonFilesystemStorage with schema validation", () => {
+  let tmpDir: string;
+  let store: JsonFilesystemStorage<ImageAsset>;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fs-test-"));
+    const storage = new FilesystemStorage({ rootDir: tmpDir });
+    store = storage.forJSON<ImageAsset>({
+      pathPrefix: "assets/images",
+      schema: ImageAssetSchema,
+    });
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it("writes valid data successfully", async () => {
+    const asset: ImageAsset = {
+      slug: "test-image",
+      title: "Test Image",
+      description: "A test image",
+      contentType: "image/jpeg",
+      width: 800,
+      height: 600,
+      url: "https://example.com/images/test.jpg",
+    };
+
+    await store.writeAll([asset]);
+    const results = await store.readAll();
+
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject(asset);
+  });
+
+  it("throws on write when data is invalid", async () => {
+    // Invalid: missing required fields and invalid URL
+    const invalidAsset = {
+      slug: "", // empty slug - invalid
+      title: "Test",
+      description: "", // empty description - invalid
+      contentType: "image/jpeg",
+      width: -100, // negative width - invalid
+      height: 600,
+      url: "not-a-valid-url", // invalid URL - missing protocol
+    };
+
+    await expect(
+      store.writeAll([invalidAsset as ImageAsset]),
+    ).rejects.toThrow();
+  });
+
+  it("throws on read when stored data is invalid", async () => {
+    // Write a JSON file manually with invalid data (missing required fields)
+    const assetsDir = path.join(tmpDir, "assets/images");
+    fs.mkdirSync(assetsDir, { recursive: true });
+    const invalidJson = JSON.stringify({
+      slug: "", // empty slug
+      title: "Test",
+      description: "Desc",
+      contentType: "image/jpeg",
+      width: 100,
+      height: 100,
+      url: "https://example.com/image.jpg",
+    });
+    fs.writeFileSync(path.join(assetsDir, "invalid.json"), invalidJson);
+
+    await expect(store.readAll()).rejects.toThrow();
+  });
+
+  it("validates URL format on write", async () => {
+    const assetWithInvalidUrl = {
+      slug: "test",
+      title: "Test",
+      description: "Desc",
+      contentType: "image/jpeg",
+      width: 100,
+      height: 100,
+      url: "not-a-url", // Missing protocol - invalid
+    };
+
+    await expect(
+      store.writeAll([assetWithInvalidUrl as ImageAsset]),
+    ).rejects.toThrow(/URL must be a valid URL/i);
+  });
+
+  it("validates positive numbers for width and height", async () => {
+    const assetWithNegativeDimensions = {
+      slug: "test",
+      title: "Test",
+      description: "Desc",
+      contentType: "image/jpeg",
+      width: -100, // negative - invalid
+      height: 200,
+      url: "https://example.com/image.jpg",
+    };
+
+    await expect(
+      store.writeAll([assetWithNegativeDimensions as ImageAsset]),
+    ).rejects.toThrow(/Width must be a positive number/i);
   });
 });

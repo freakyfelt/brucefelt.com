@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import Yaml from "yaml";
+import z from "zod";
 
 type HasSlug = {
   slug: string;
@@ -215,7 +216,9 @@ class BaseFilesystemStorage<T extends HasSlug, TRaw extends HasSlug> {
 export type JsonFilesystemStorageConfig = Omit<
   BaseFilesystemStorageConfig,
   "extension"
->;
+> & {
+  schema?: z.ZodObject<z.ZodRawShape>;
+};
 
 /**
  * Handles reading and writing JSON to the filesystem
@@ -225,27 +228,35 @@ export type JsonFilesystemStorageConfig = Omit<
 export class JsonFilesystemStorage<
   T extends HasSlug,
 > extends BaseFilesystemStorage<T, T> {
+  private schema?: z.ZodObject<z.ZodRawShape>;
+
   constructor(jsonConfig: JsonFilesystemStorageConfig) {
     super({
       extension: "json",
       ...jsonConfig,
     });
+
+    this.schema = jsonConfig.schema;
   }
 
   protected async encodeItem(item: T): Promise<string> {
-    return JSON.stringify(item, null, 2);
+    const validated = this.schema ? this.schema.parse(item) : item;
+    return JSON.stringify(validated, null, 2);
   }
 
   protected async decodeItem(file: File): Promise<T> {
     const content = await file.text();
-    return JSON.parse(content) as T;
+    const parsed = JSON.parse(content) as T;
+    return this.schema ? (this.schema.parse(parsed) as T) : parsed;
   }
 }
 
 type MarkdownFilesystemStorageConfig = Omit<
   BaseFilesystemStorageConfig,
   "extension"
->;
+> & {
+  schema?: z.ZodObject<z.ZodRawShape>;
+};
 
 /**
  * Outputs a markdown file with frontmatter
@@ -254,25 +265,38 @@ export class MdxFilesystemStorage<
   TRaw extends HasContent & HasSlug,
   T extends HasSlug,
 > extends BaseFilesystemStorage<T, TRaw> {
+  private schema?: z.ZodObject<z.ZodRawShape>;
+
   constructor(private mdConfig: MarkdownFilesystemStorageConfig) {
     super({
       extension: "mdx",
       ...mdConfig,
     });
+
+    this.schema = mdConfig.schema;
   }
+
   protected async encodeItem(item: TRaw): Promise<string> {
     const { content, ...rest } = item;
-    const yaml = Yaml.stringify(rest);
+
+    const frontmatter = this.schema ? this.schema.parse(rest) : rest;
+    const yaml = Yaml.stringify(frontmatter);
 
     return `---\n${yaml}---\n${content}\n`;
   }
 
   protected async decodeItem(file: File): Promise<T> {
-    const { default: content, frontmatter } = await import(
+    const { default: content, frontmatter: rest } = await import(
       `@data/${file.path}`
     );
 
-    return { ...frontmatter, content } as unknown as T;
+    try {
+      const frontmatter = this.schema ? this.schema.parse(rest) : rest;
+
+      return { ...frontmatter, content } as unknown as T;
+    } catch (e: unknown) {
+      throw new Error(`Error parsing frontmatter in ${file.path}: ${e}`);
+    }
   }
 
   /**
