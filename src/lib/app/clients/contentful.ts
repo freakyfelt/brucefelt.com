@@ -27,7 +27,6 @@ export class ContentfulGraphQLClient {
     );
     if (!res.ok) {
       console.error("GraphQL Error:", await res.text());
-      console.debug("GraphQL Query:", { query, variables });
       throw new Error("Failed to fetch data from Contentful");
     }
     return res.json();
