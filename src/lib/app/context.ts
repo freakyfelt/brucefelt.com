@@ -19,8 +19,8 @@ const { CONTENTFUL_SPACE_ID, CONTENTFUL_ACCESS_TOKEN } = process.env;
 
 export const config: AppConfig = {
   contentful: {
-    spaceId: CONTENTFUL_SPACE_ID,
-    accessToken: CONTENTFUL_ACCESS_TOKEN,
+    spaceId: CONTENTFUL_SPACE_ID?.trim(),
+    accessToken: CONTENTFUL_ACCESS_TOKEN?.trim(),
   },
   storage: {
     rootDir: path.join(process.cwd(), "data"),

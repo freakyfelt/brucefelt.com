@@ -33,14 +33,14 @@ jobs:
       - name: Run unit tests
         run: npm run test:ci
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-
       - name: Build the application
         run: npm run deploy
         env:
           CONTENTFUL_ACCESS_TOKEN: ${{ secrets.CONTENTFUL_ACCESS_TOKEN }}
           CONTENTFUL_SPACE_ID: ${{ secrets.CONTENTFUL_SPACE_ID }}
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
       - name: Run end-to-end tests
         run: npm run test:e2e
