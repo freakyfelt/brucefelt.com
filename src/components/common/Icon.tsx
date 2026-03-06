@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  SiGithub,
-  SiX,
-  SiBluesky,
-  SiInstagram,
-} from "react-icons/si";
+import { SiGithub, SiX, SiBluesky, SiInstagram } from "react-icons/si";
 import {
   LuSun,
   LuMoon,
