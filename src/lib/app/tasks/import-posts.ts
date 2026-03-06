@@ -1,10 +1,8 @@
-import { Tag } from "@/interfaces/tag";
 import { appContext, AppContext } from "@/lib/app/context";
 import { staticImageAssets } from "@/lib/data/assets";
-import { transformMarkdownContent } from "@/lib/app/utils/mdx/markdown-transformer";
+import { extractContentfulAssetIds } from "@/lib/app/utils/asset-scanner";
 
 type ImportResults = {
-  posts: string[];
   tags: string[];
   assets: string[];
 };
@@ -13,23 +11,17 @@ export class ImportPostsTask {
   constructor(private context: AppContext) {}
 
   async perform(): Promise<ImportResults> {
-    const metadata = await this.context.stores.contentfulBlog.getAllPostSlugs();
-    const slugs = metadata.map((m) => m.slug);
-    const rawPosts =
-      await this.context.stores.contentfulBlog.getBlogPosts(slugs);
+    // Phase 1: Read local .mdx posts as raw text (no MDX compilation)
+    const rawPosts = await this.context.stores.blogPosts.readAllRaw();
 
+    // Phase 2: Extract Contentful asset IDs from post content
     const allAssetIds = new Set<string>(Object.values(staticImageAssets));
-    const posts = rawPosts.map((post) => {
-      const { transformedContent, assetIds } = transformMarkdownContent(
-        post.content,
-      );
-      assetIds.forEach((id) => allAssetIds.add(id));
-      return {
-        ...post,
-        content: transformedContent,
-      };
-    });
+    for (const post of rawPosts) {
+      const ids = extractContentfulAssetIds(post.content);
+      ids.forEach((id) => allAssetIds.add(id));
+    }
 
+    // Phase 3: Fetch assets from Contentful and write to filesystem
     const assets = await this.context.stores.contentfulBlog.getAssets(
       Array.from(allAssetIds),
     );
@@ -37,23 +29,15 @@ export class ImportPostsTask {
       deleteExisting: true,
     });
 
-    const tagsBySlug = metadata.reduce((acc, m) => {
-      m.tags.forEach((tag) => {
-        acc.set(tag.slug, tag);
-      });
-      return acc;
-    }, new Map<string, Tag>());
-
-    const tags = Array.from(tagsBySlug.values());
-
+    // Phase 4: Collect tag slugs from frontmatter, fetch from Contentful
+    const allTagSlugs = [...new Set(rawPosts.flatMap((p) => p.tags))];
+    const tags =
+      await this.context.stores.contentfulBlog.getTagsBySlugs(allTagSlugs);
     const tagPaths = await this.context.stores.blogTags.writeAll(tags, {
       deleteExisting: true,
     });
-    const postPaths = await this.context.stores.blogPosts.writeAll(posts, {
-      deleteExisting: true,
-    });
 
-    return { posts: postPaths, tags: tagPaths, assets: assetPaths };
+    return { tags: tagPaths, assets: assetPaths };
   }
 }
 

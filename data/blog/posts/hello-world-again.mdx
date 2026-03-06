@@ -1,0 +1,30 @@
+---
+title: Hello World (Again)
+slug: hello-world-again
+publishDate: 2020-04-14T09:30:00.000+02:00
+description: Welcome to the new face of brucefelt.com
+tags:
+  - general
+  - development
+  - berlin
+status: archived
+---
+
+> [!WARNING]
+> Stale content (2020)
+>
+> This post is from 2020 and its content is no longer accurate
+
+Hello again! If you saw the site prior to April 2020 you probably noticed that things look a bit...bland. I just migrated from Wordpress's hosted blog system to a new solution that may motivate me to actually keep the thing up to date (see below for more details).
+
+# Updates since October 2018
+
+Yes really. My last post was October 2018 on the old site. Since then I jumped from Seattle to London in December 2018 to work at a startup (Fat Llama). I met some great people, both at the company and in the gay community. However, I didn't feel at home with the job and the city and decided to look for opportunities elsewhere.
+
+I moved to Berlin to join Contentful in basically the start of 2020. Contentful is a company that provides a platform to host content you want to be made available for consuming in devices, websites, wearables, billboards, wherever. I'm currently working with a team of awesome developers aiming to speed up the way that content creators manage their content in bulk. The company itself has been top notch and has been a great fit.
+
+As for Berlin itself? I've visited here multiple times since my first time abroad in 2010 and continue to enjoy it even as a resident. Yes the German bureaucracy can get annoying. And the language, while not absolutely required to survive, is difficult to learn. But both of them have been manageable and the people I've met have helped me feel at home (thanks to all of you lovely people and those that encouraged our meeting).
+
+# Alright tell me about the nerdy stuff
+
+This incarnation of the website uses [Gatsby.js](https://gatsbyjs.org/) to generate a static React website every time a build is triggered. Static in this case means that there's no database, no PHP/NodeJS/Ruby, no real backend to speak of, on the public website. That results in a very speedy site with a smaller attack surface. Hosting itself is done using [Netlify](https://netlify.org/), which listens to changes on the code hosted in [GitHub](https://github.com/freakyfelt/brucefelt-com) along with blog content that is hosted in my Contentful space and then rebuilds and deploys the website. It's pretty slick.
