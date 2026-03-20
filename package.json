@@ -59,15 +59,15 @@
     "dotenv": "^17.3.1",
     "eslint": "^9.39.3",
     "eslint-config-next": "^16.1.6",
-    "jsdom": "^28.1.0",
-    "msw": "^2.12.10",
+    "jsdom": "^29.0.1",
+    "msw": "^2.12.13",
     "playwright": "^1.58.2",
     "prettier": "^3",
     "serve": "^14.2.6",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
-    "vitest": "^4.0.18",
+    "vitest": "^4.1.0",
     "yaml": "^2.8.2"
   }
 }
