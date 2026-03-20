@@ -64,7 +64,7 @@ updates:
           - "@playwright/test"
           - "playwright"
           - "vitest"
-          - "@vitest/*"
+          - "@vitejs/*"
           - "@testing-library/*"
           - "jsdom"
           - "msw"
