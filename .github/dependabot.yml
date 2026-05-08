@@ -43,21 +43,22 @@ updates:
           - "remark-rehype"
       # UI dependencies - React components and styling
       ui:
-        dependency-type: "production"
         patterns:
           - "react"
           - "react-*"
           - "@types/react"
           - "@types/react-*"
           - "@radix-ui/*"
-          - "tailwindcss"
-          - "@tailwindcss/*"
-          - "tailwind-merge"
-          - "tailwindcss-animate"
-          - "class-variance-authority"
-          - "clsx"
           - "lucide-react"
           - "embla-carousel-react"
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "tailwind-*"
+          - "tailwindcss-*"
+          - "class-variance-authority"
+          - "clsx"
       test:
         dependency-type: "development"
         patterns:
