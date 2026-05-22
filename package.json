@@ -65,9 +65,9 @@
     "prettier": "^3",
     "serve": "^14.2.6",
     "tailwindcss": "^4",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.1",
     "typescript": "^6",
     "vitest": "^4.1.5",
-    "yaml": "^2.8.4"
+    "yaml": "^2.9.0"
   }
 }
